@@ -1,0 +1,24 @@
+﻿{% extends "core/base.html" %}
+
+{% block title %}Detalhe do cliente{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Detalhe do cliente</h2>
+    <div>
+        <a href="{% url 'cliente_update' cliente.pk %}" class="btn btn-outline-secondary">Editar</a>
+        <a href="{% url 'cliente_delete' cliente.pk %}" class="btn btn-outline-danger">Excluir</a>
+        <a href="{% url 'cliente_list' %}" class="btn btn-primary">Voltar</a>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <p><strong>Usuário:</strong> {{ cliente.usuario.username }}</p>
+        <p><strong>Nome:</strong> {{ cliente.nome }}</p>
+        <p><strong>CPF:</strong> {{ cliente.cpf }}</p>
+        <p><strong>Telefone:</strong> {{ cliente.telefone }}</p>
+        <p class="mb-0"><strong>Ativo:</strong> {{ cliente.ativo|yesno:"Sim,Não" }}</p>
+    </div>
+</div>
+{% endblock %}
