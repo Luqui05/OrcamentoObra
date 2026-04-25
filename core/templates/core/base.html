@@ -22,21 +22,37 @@
         --oo-brand-900: #0f172a;
         --oo-brand-700: #1e293b;
         --oo-success: #198754;
+        --oo-header-height: 56px;
       }
 
       html,
       body {
+        min-height: 100%;
         margin: 0;
         padding: 0;
       }
 
       body {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        padding-top: var(--oo-header-height);
         background: radial-gradient(circle at top right, #e2e8f0 0%, var(--oo-bg) 40%, #f8fafc 100%);
         color: var(--oo-ink);
       }
 
       .navbar {
+        min-height: var(--oo-header-height);
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1030;
         box-shadow: 0 2px 14px rgba(0, 0, 0, 0.08);
+      }
+
+      main {
+        flex: 1 0 auto;
       }
 
       .hero-shell {
@@ -109,44 +125,64 @@
       }
 
       footer {
+        flex-shrink: 0;
         background: var(--oo-surface);
       }
+
+      .auth-main {
+        max-width: 1080px;
+      }
+
+      @media (max-width: 767.98px) {
+        body {
+          padding-top: 54px;
+        }
+      }
     </style>
+    {% block extra_css %}{% endblock %}
   </head>
   <body class="sb-nav-fixed">
     <nav class="navbar navbar-expand navbar-dark bg-dark">
       <div class="container-fluid px-4">
         <a class="navbar-brand fw-semibold" href="{% url 'index' %}">OrcamentoObra</a>
 
-        <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
-          <li class="nav-item dropdown">
-            <a
-              class="nav-link dropdown-toggle"
-              id="navbarDropdown"
-              href="#"
-              role="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              <i class="fas fa-user fa-fw"></i>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-              <li><a class="dropdown-item" href="{% url 'index' %}">Início</a></li>
-              <li><a class="dropdown-item" href="{% url 'sobre' %}">Sobre</a></li>
-              <li><hr class="dropdown-divider" /></li>
-              <li>
-                <form method="post" action="{% url 'logout' %}" class="m-0">
-                  {% csrf_token %}
-                  <button type="submit" class="dropdown-item">Sair</button>
-                </form>
-              </li>
-            </ul>
-          </li>
-        </ul>
+        {% if request.user.is_authenticated %}
+          <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                id="navbarDropdown"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i class="fas fa-user fa-fw"></i>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                <li><a class="dropdown-item" href="{% url 'index' %}">Início</a></li>
+                <li><a class="dropdown-item" href="{% url 'sobre' %}">Sobre</a></li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <form method="post" action="{% url 'logout' %}" class="m-0">
+                    {% csrf_token %}
+                    <button type="submit" class="dropdown-item">Sair</button>
+                  </form>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        {% else %}
+          <ul class="navbar-nav ms-auto me-3 me-lg-4">
+            <li class="nav-item"><a class="nav-link" href="{% url 'sobre' %}">Sobre</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Entrar</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'cadastro_usuario' %}">Cadastro</a></li>
+          </ul>
+        {% endif %}
       </div>
     </nav>
 
-    <main class="container-fluid px-4 py-4">
+    <main class="{% block main_class %}container-fluid px-4 py-4{% endblock %}">
       {% block content %}{% endblock %}
     </main>
 
