@@ -116,12 +116,33 @@
   <body class="sb-nav-fixed">
     <nav class="navbar navbar-expand navbar-dark bg-dark">
       <div class="container-fluid px-4">
-        <a class="navbar-brand fw-semibold" href="{% url 'sobre' %}">OrcamentoObra</a>
+        <a class="navbar-brand fw-semibold" href="{% url 'index' %}">OrcamentoObra</a>
 
-        <div class="ms-auto d-flex align-items-center gap-2">
-          <a class="btn btn-outline-light btn-sm" href="{% url 'login' %}">Login</a>
-          <a class="btn btn-warning btn-sm" href="{% url 'cadastro_usuario' %}">Cadastro</a>
-        </div>
+        <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
+          <li class="nav-item dropdown">
+            <a
+              class="nav-link dropdown-toggle"
+              id="navbarDropdown"
+              href="#"
+              role="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i class="fas fa-user fa-fw"></i>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="{% url 'index' %}">Início</a></li>
+              <li><a class="dropdown-item" href="{% url 'sobre' %}">Sobre</a></li>
+              <li><hr class="dropdown-divider" /></li>
+              <li>
+                <form method="post" action="{% url 'logout' %}" class="m-0">
+                  {% csrf_token %}
+                  <button type="submit" class="dropdown-item">Sair</button>
+                </form>
+              </li>
+            </ul>
+          </li>
+        </ul>
       </div>
     </nav>
 

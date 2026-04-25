@@ -12,7 +12,11 @@
             {% csrf_token %}
             {{ form.as_p }}
             <button type="submit" class="btn btn-primary">{{ botao|default:"Salvar" }}</button>
-            <a href="{% url 'cliente_list' %}" class="btn btn-outline-secondary">Cancelar</a>
+            {% if cancel_url_name %}
+                <a href="{% url cancel_url_name %}" class="btn btn-outline-secondary">Cancelar</a>
+            {% else %}
+                <a href="{% url 'cliente_list' %}" class="btn btn-outline-secondary">Cancelar</a>
+            {% endif %}
         </form>
     </div>
 </div>

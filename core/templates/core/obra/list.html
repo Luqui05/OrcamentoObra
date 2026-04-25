@@ -1,0 +1,47 @@
+{% extends "core/base.html" %}
+
+{% block title %}Obras{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Obras</h2>
+    <a href="{% url 'obra_create' %}" class="btn btn-primary">Nova obra</a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        {% if obras %}
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>Título</th>
+                            <th>Cliente principal</th>
+                            <th>Endereço</th>
+                            <th>Data de cadastro</th>
+                            <th class="text-end">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for obra in obras %}
+                            <tr>
+                                <td>{{ obra.titulo }}</td>
+                                <td>{{ obra.cliente_principal.nome }}</td>
+                                <td>{{ obra.endereco }}</td>
+                                <td>{{ obra.data_cadastro|date:"d/m/Y H:i" }}</td>
+                                <td class="text-end">
+                                    <a href="{% url 'obra_detail' obra.pk %}" class="btn btn-sm btn-outline-primary">Detalhar</a>
+                                    <a href="{% url 'obra_update' obra.pk %}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                                    <a href="{% url 'obra_delete' obra.pk %}" class="btn btn-sm btn-outline-danger">Excluir</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="mb-0">Nenhuma obra cadastrada.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
