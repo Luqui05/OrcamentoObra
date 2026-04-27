@@ -2,6 +2,25 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 
+
+def orcamento_upload_path(instance, filename):
+    """Organiza arquivos de orçamento por obra e versão."""
+    # Para compatibilidade com uploads antigos, manter estrutura original
+    return f"orcamentos/pdfs/{filename}"
+
+
+def documento_upload_path(instance, filename):
+    """Organiza arquivos de documento por obra e tipo."""
+    tipo = instance.get_tipo_documento_display().lower().replace(' ', '_')
+    return f"documentos/obra_{instance.obra.id}/{tipo}/{filename}"
+
+
+def imagem_upload_path(instance, filename):
+    """Organiza imagens por obra e atualização (ou geral)."""
+    if instance.atualizacao_obra:
+        return f"obras/imagens/obra_{instance.obra.id}/atualizacao_{instance.atualizacao_obra.id}/{filename}"
+    return f"obras/imagens/obra_{instance.obra.id}/geral/{filename}"
+
 class Cliente(models.Model):
     usuario = models.OneToOneField(
         settings.AUTH_USER_MODEL,
@@ -61,7 +80,7 @@ class Orcamento(models.Model):
     versao = models.PositiveIntegerField()
     descricao = models.TextField()
     valor_total = models.DecimalField(max_digits=12, decimal_places=2)
-    arquivo_pdf = models.FileField(upload_to="orcamentos/pdfs/")
+    arquivo_pdf = models.FileField(upload_to=orcamento_upload_path)
     data_emissao = models.DateTimeField(auto_now_add=True)
     status = models.CharField(
         max_length=20,
@@ -94,7 +113,7 @@ class Documento(models.Model):
     obra = models.ForeignKey(Obra, on_delete=models.CASCADE, related_name="documentos")
     titulo = models.CharField(max_length=150)
     tipo_documento = models.CharField(max_length=20, choices=TipoDocumento.choices)
-    arquivo = models.FileField(upload_to="documentos/arquivos/")
+    arquivo = models.FileField(upload_to=documento_upload_path)
     descricao = models.TextField(blank=True)
     data_upload = models.DateTimeField(auto_now_add=True)
 
@@ -130,7 +149,7 @@ class ImagemObra(models.Model):
         blank=True,
         null=True,
     )
-    imagem = models.ImageField(upload_to="obras/imagens/")
+    imagem = models.ImageField(upload_to=imagem_upload_path)
     legenda = models.CharField(max_length=255, blank=True)
     data_upload = models.DateTimeField(auto_now_add=True)
 
