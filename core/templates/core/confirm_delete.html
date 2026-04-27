@@ -12,7 +12,9 @@
         <form method="post">
             {% csrf_token %}
             <button type="submit" class="btn btn-danger">Excluir</button>
-            {% if cancel_url_name %}
+            {% if cancel_url %}
+                <a href="{{ cancel_url }}" class="btn btn-outline-secondary">Cancelar</a>
+            {% elif cancel_url_name %}
                 <a href="{% url cancel_url_name %}" class="btn btn-outline-secondary">Cancelar</a>
             {% else %}
                 <a href="{% url 'cliente_list' %}" class="btn btn-outline-secondary">Cancelar</a>

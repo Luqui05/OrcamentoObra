@@ -8,8 +8,8 @@ from django.views.generic import (
     UpdateView,
 )
 
-from .forms import ClienteForm, ObraForm
-from .models import Cliente, Obra
+from .forms import ClienteForm, ObraForm, OrcamentoForm
+from .models import Cliente, Obra, Orcamento
 
 
 class HomeTemplateView(TemplateView):
@@ -83,6 +83,11 @@ class ObraDetailView(DetailView):
     model = Obra
     template_name = "core/obra/detail.html"
     context_object_name = "obra"
+    
+    def get_context_data(self, **kwargs):
+        context =  super().get_context_data(**kwargs)
+        context["orcamentos"] = self.object.orcamentos.all()
+        return context
 
 
 class ObraCreateView(CreateView):
@@ -120,3 +125,60 @@ class ObraDeleteView(DeleteView):
         "titulo": "Excluir obra",
         "cancel_url_name": "obra_list",
     }
+    
+class OrcamentoDetailView(DetailView):
+    model = Orcamento
+    template_name = "core/orcamento/detail.html"
+    context_object_name = "orcamento"
+    
+class OrcamentoCreateView(CreateView):
+    model = Orcamento
+    form_class = OrcamentoForm
+    template_name = "core/form.html"
+    
+    def get_success_url(self):
+        return reverse_lazy("obra_detail", kwargs={"pk": self.object.obra.pk})
+    
+    def get_initial(self):
+        initial = super().get_initial()
+        obra_pk = self.kwargs.get("obra_pk")
+        initial["obra"] = Obra.objects.get(pk=obra_pk)
+        return initial
+    
+    def form_valid(self, form):
+        obra_pk = self.kwargs.get("obra_pk")
+        form.instance.obra = Obra.objects.get(pk=obra_pk)
+        return super().form_valid(form)
+    
+    extra_context = {
+        "titulo": "Cadastrar orçamento",
+        "botao": "Salvar",
+    }
+    
+class OrcamentoUpdateView(UpdateView):
+    model = Orcamento
+    form_class = OrcamentoForm
+    template_name = "core/form.html"
+    
+    def get_success_url(self):
+        return reverse_lazy("obra_detail", kwargs={"pk": self.object.obra.pk})
+    
+    extra_context = {
+        "titulo": "Editar orçamento",
+        "botao": "Atualizar",
+    }
+
+class OrcamentoDeleteView(DeleteView):
+    model = Orcamento
+    template_name = "core/confirm_delete.html"
+    
+    def get_success_url(self):
+        return reverse_lazy("obra_detail", kwargs={"pk": self.object.obra.pk})
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["titulo"] = "Excluir orçamento"
+        context["cancel_url"] = reverse_lazy(
+            "obra_detail", kwargs={"pk": self.object.obra.pk}
+        )
+        return context

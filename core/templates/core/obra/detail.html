@@ -12,7 +12,7 @@
     </div>
 </div>
 
-<div class="card shadow-sm">
+<div class="card shadow-sm mb-4">
     <div class="card-body">
         <p><strong>Título:</strong> {{ obra.titulo }}</p>
         <p><strong>Descrição:</strong> {{ obra.descricao|default:"-" }}</p>
@@ -29,6 +29,48 @@
             <p>-</p>
         {% endif %}
         <p class="mb-0"><strong>Data de cadastro:</strong> {{ obra.data_cadastro|date:"d/m/Y H:i" }}</p>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="mb-0">Orçamentos</h3>
+    <a href="{% url 'orcamento_create' obra.pk %}" class="btn btn-primary">Novo orçamento</a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        {% if orcamentos %}
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>Versão</th>
+                            <th>Valor Total</th>
+                            <th>Status</th>
+                            <th>Data de Emissão</th>
+                            <th class="text-end">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for orcamento in orcamentos %}
+                            <tr>
+                                <td>{{ orcamento.versao }}</td>
+                                <td>R$ {{ orcamento.valor_total|floatformat:2 }}</td>
+                                <td>{{ orcamento.get_status_display }}</td>
+                                <td>{{ orcamento.data_emissao|date:"d/m/Y H:i" }}</td>
+                                <td class="text-end">
+                                    <a href="{% url 'orcamento_detail' orcamento.pk %}" class="btn btn-sm btn-outline-primary">Detalhar</a>
+                                    <a href="{% url 'orcamento_update' orcamento.pk %}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                                    <a href="{% url 'orcamento_delete' orcamento.pk %}" class="btn btn-sm btn-outline-danger">Excluir</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="mb-0">Nenhum orçamento cadastrado para esta obra.</p>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

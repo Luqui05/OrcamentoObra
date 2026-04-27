@@ -13,19 +13,33 @@ from .views import (
     ObraListView,
     ObraUpdateView,
     SobreTemplateView,
+    OrcamentoDetailView,
+    OrcamentoCreateView,
+    OrcamentoUpdateView,
+    OrcamentoDeleteView,
 )
 
 urlpatterns = [
     path("", HomeTemplateView.as_view(), name="index"),
     path("sobre/", SobreTemplateView.as_view(), name="sobre"),
+    
+    # Clientes
     path("clientes/", ClienteListView.as_view(), name="cliente_list"),
     path("clientes/novo/", ClienteCreateView.as_view(), name="cliente_create"),
     path("clientes/<int:pk>/", ClienteDetailView.as_view(), name="cliente_detail"),
     path("clientes/<int:pk>/editar/", ClienteUpdateView.as_view(), name="cliente_update"),
     path("clientes/<int:pk>/excluir/", ClienteDeleteView.as_view(), name="cliente_delete"),
+    
+    # Obras
     path("obras/", ObraListView.as_view(), name="obra_list"),
     path("obras/nova/", ObraCreateView.as_view(), name="obra_create"),
     path("obras/<int:pk>/", ObraDetailView.as_view(), name="obra_detail"),
     path("obras/<int:pk>/editar/", ObraUpdateView.as_view(), name="obra_update"),
     path("obras/<int:pk>/excluir/", ObraDeleteView.as_view(), name="obra_delete"),
+    
+    # Orcamento
+    path("orcamentos/<int:pk>/", OrcamentoDetailView.as_view(), name="orcamento_detail"),
+    path("obras/<int:obra_pk>/orcamentos/novo/", OrcamentoCreateView.as_view(), name="orcamento_create"),
+    path("orcamentos/<int:pk>/editar/", OrcamentoUpdateView.as_view(), name="orcamento_update"),
+    path("orcamentos/<int:pk>/excluir/", OrcamentoDeleteView.as_view(), name="orcamento_delete"),
 ]

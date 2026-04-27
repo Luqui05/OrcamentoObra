@@ -1,0 +1,34 @@
+{% extends "core/base.html" %}
+
+{% block title %}Detalhe do orçamento{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Detalhe do orçamento</h2>
+    <div>
+        <a href="{% url 'orcamento_update' orcamento.pk %}" class="btn btn-outline-secondary">Editar</a>
+        <a href="{% url 'orcamento_delete' orcamento.pk %}" class="btn btn-outline-danger">Excluir</a>
+        <a href="{% url 'obra_detail' orcamento.obra.pk %}" class="btn btn-primary">Voltar</a>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <p><strong>Obra:</strong> {{ orcamento.obra.titulo }}</p>
+        <p><strong>Versão:</strong> {{ orcamento.versao }}</p>
+        <p><strong>Descrição:</strong> {{ orcamento.descricao|default:"-" }}</p>
+        <p><strong>Valor Total:</strong> R$ {{ orcamento.valor_total|floatformat:2 }}</p>
+        <p><strong>Status:</strong> {{ orcamento.get_status_display }}</p>
+        <p><strong>Data de Emissão:</strong> {{ orcamento.data_emissao|date:"d/m/Y H:i" }}</p>
+        <p><strong>Data de Resposta:</strong> {{ orcamento.data_resposta|date:"d/m/Y H:i"|default:"-" }}</p>
+        <p><strong>Mensagem do Cliente:</strong> {{ orcamento.mensagem_cliente|default:"-" }}</p>
+        <p class="mb-0"><strong>Arquivo PDF:</strong>
+            {% if orcamento.arquivo_pdf %}
+                <a href="{{ orcamento.arquivo_pdf.url }}" target="_blank" class="btn btn-sm btn-outline-primary">Baixar</a>
+            {% else %}
+                -
+            {% endif %}
+        </p>
+    </div>
+</div>
+{% endblock %}

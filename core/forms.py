@@ -1,6 +1,6 @@
 ﻿from django import forms
 
-from .models import Cliente, Obra
+from .models import Cliente, Obra, Orcamento
 
 
 class ClienteForm(forms.ModelForm):
@@ -40,3 +40,15 @@ class ObraForm(forms.ModelForm):
             )
 
         return cleaned_data
+    
+class OrcamentoForm(forms.ModelForm):
+    class Meta:
+        model = Orcamento
+        fields = ["versao", "descricao", "valor_total", "arquivo_pdf", "status"]
+        widgets = {
+            "versao": forms.NumberInput(attrs={"class": "form-control"}),
+            "descricao": forms.Textarea(attrs={"class": "form-control", "rows": 4}),
+            "valor_total": forms.NumberInput(attrs={"class": "form-control", "step": "0.01"}),
+            "arquivo_pdf": forms.FileInput(attrs={"class": "form-control"}),
+            "status": forms.Select(attrs={"class": "form-select"}),
+        }
