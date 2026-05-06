@@ -1,6 +1,12 @@
 ﻿from django import forms
 
-from .models import Cliente, Obra, Orcamento
+from .models import (
+    AtualizacaoObra,
+    Cliente,
+    ImagemObra,
+    Obra,
+    Orcamento,
+)
 
 
 class ClienteForm(forms.ModelForm):
@@ -40,7 +46,8 @@ class ObraForm(forms.ModelForm):
             )
 
         return cleaned_data
-    
+
+
 class OrcamentoForm(forms.ModelForm):
     class Meta:
         model = Orcamento
@@ -48,7 +55,20 @@ class OrcamentoForm(forms.ModelForm):
         widgets = {
             "versao": forms.NumberInput(attrs={"class": "form-control"}),
             "descricao": forms.Textarea(attrs={"class": "form-control", "rows": 4}),
-            "valor_total": forms.NumberInput(attrs={"class": "form-control", "step": "0.01"}),
+            "valor_total": forms.NumberInput(
+                attrs={"class": "form-control", "step": "0.01"}
+            ),
             "arquivo_pdf": forms.FileInput(attrs={"class": "form-control"}),
             "status": forms.Select(attrs={"class": "form-select"}),
+        }
+
+
+class AtualizacaoObraForm(forms.ModelForm):
+    class Meta:
+        model = AtualizacaoObra
+        fields = ["titulo", "descricao", "semana_referencia"]
+        widgets = {
+            "titulo": forms.TextInput(attrs={"class": "form-control"}),
+            "descricao": forms.Textarea(attrs={"class": "form-control", "rows": 4}),
+            "semana_referencia": forms.NumberInput(attrs={"class": "form-control"}),
         }

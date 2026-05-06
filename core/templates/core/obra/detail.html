@@ -73,4 +73,42 @@
         {% endif %}
     </div>
 </div>
+
+<div class="d-flex justify-content-between align-items-center mt-4 mb-3">
+    <h3 class="mb-0">Atualizações da Obra</h3>
+    <a href="{% url 'atualizacao_create' obra.pk %}" class="btn btn-primary">Nova atualização</a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        {% if atualizacoes %}
+            <div id="carouselAtualizacoes" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    {% for atualizacao in atualizacoes %}
+                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ atualizacao.titulo }}</h5>
+                                    <h6 class="card-subtitle mb-2 text-muted">Semana {{ atualizacao.semana_referencia }}</h6>
+                                    <p class="card-text">{{ atualizacao.descricao|truncatewords:30 }}</p>
+                                    <a href="{% url 'atualizacao_detail' atualizacao.pk %}" class="btn btn-sm btn-outline-primary">Ver detalhes</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselAtualizacoes" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselAtualizacoes" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        {% else %}
+            <p class="mb-0">Nenhuma atualização cadastrada para esta obra.</p>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

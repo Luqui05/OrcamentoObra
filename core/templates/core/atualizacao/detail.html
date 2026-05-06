@@ -1,0 +1,27 @@
+{% extends "core/base.html" %}
+
+{% block title %}Detalhe da Atualização{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Detalhe da Atualização</h2>
+    <div>
+        <a href="{% url 'atualizacao_update' atualizacao.pk %}" class="btn btn-outline-secondary">Editar</a>
+        <a href="{% url 'atualizacao_delete' atualizacao.pk %}" class="btn btn-outline-danger">Excluir</a>
+        <a href="{% url 'obra_detail' atualizacao.obra.pk %}" class="btn btn-primary">Voltar para Obra</a>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <p><strong>Obra:</strong> {{ atualizacao.obra.titulo }}</p>
+        <p><strong>Título:</strong> {{ atualizacao.titulo }}</p>
+        <p><strong>Semana de Referência:</strong> {{ atualizacao.semana_referencia }}</p>
+        <p><strong>Descrição:</strong> {{ atualizacao.descricao|default:"-" }}</p>
+        <p class="mb-0"><strong>Data de Cadastro:</strong> {{ atualizacao.data|date:"d/m/Y H:i" }}</p>
+    </div>
+</div>
+
+<!-- Seção de Imagens será adicionada aqui -->
+
+{% endblock %}
