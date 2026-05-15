@@ -31,7 +31,14 @@ class OrcamentoCreateView(CreateView):
         obra_pk = self.kwargs.get("obra_pk")
         if obra_pk:
             form.instance.obra = Obra.objects.get(pk=obra_pk)
-        return super().form_valid(form)
+        response = super().form_valid(form)
+
+        # Marcar orçamentos anteriores da mesma obra como RECUSADO
+        from django.utils import timezone
+
+        Orcamento.objects.filter(obra=self.object.obra).exclude(pk=self.object.pk).exclude(status=Orcamento.StatusChoices.RECUSADO).update(status=Orcamento.StatusChoices.RECUSADO, data_resposta=timezone.now())
+
+        return response
 
     extra_context = {
         "titulo": "Cadastrar orçamento",
