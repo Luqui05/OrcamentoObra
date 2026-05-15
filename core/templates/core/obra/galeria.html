@@ -61,6 +61,13 @@
         background: #e9ecef;
     }
 
+    .galeria-card {
+        display: flex;
+        flex-direction: column;
+        min-height: 100%;
+        background: #f8f9fa;
+    }
+
     .galeria-item {
         position: relative;
         min-height: 180px;
@@ -109,6 +116,19 @@
         font-size: 0.78rem;
     }
 
+    .galeria-card .acoes {
+        padding: 0.6rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        border-top: 1px solid #dee2e6;
+        background: #fff;
+    }
+
+    .galeria-card .acoes .btn {
+        flex: 1 1 calc(33.333% - 0.4rem);
+    }
+
     .galeria-vazia {
         color: #6c757d;
         padding: 1.2rem;
@@ -133,6 +153,10 @@
         .galeria-item img,
         .galeria-item .placeholder {
             min-height: 150px;
+        }
+
+        .galeria-card .acoes .btn {
+            flex: 1 1 100%;
         }
     }
 </style>
@@ -181,13 +205,20 @@
             {% if galeria_midias %}
                 <div class="galeria-grid">
                     {% for item in galeria_midias %}
-                        <a href="{{ item.url }}" target="_blank" class="galeria-item" title="Abrir imagem">
-                            <img src="{{ item.url }}" alt="{{ item.titulo }}">
-                            <div class="info">
-                                <div>{{ item.titulo }}</div>
-                                <small>{{ item.data|date:"d/m/Y H:i" }}</small>
+                        <div class="galeria-card">
+                            <a href="{{ item.url }}" target="_blank" class="galeria-item" title="Abrir imagem">
+                                <img src="{{ item.url }}" alt="{{ item.titulo }}">
+                                <div class="info">
+                                    <div>{{ item.titulo }}</div>
+                                    <small>{{ item.data|date:"d/m/Y H:i" }}</small>
+                                </div>
+                            </a>
+                            <div class="acoes">
+                                <a href="{% url 'imagem_detail' item.obj.pk %}" class="btn btn-sm btn-outline-primary">Abrir</a>
+                                <a href="{% url 'imagem_update' item.obj.pk %}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                                <a href="{% url 'imagem_delete' item.obj.pk %}" class="btn btn-sm btn-outline-danger">Excluir</a>
                             </div>
-                        </a>
+                        </div>
                     {% endfor %}
                 </div>
             {% else %}
