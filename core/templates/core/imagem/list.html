@@ -1,0 +1,39 @@
+{% extends "core/base.html" %}
+
+{% block title %}Imagens - {{ obra.titulo }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4>Imagens da obra: {{ obra.titulo }}</h4>
+    <a href="{% url 'imagem_create' obra.pk %}" class="btn btn-success">Adicionar imagem</a>
+</div>
+
+<div class="row g-3">
+    {% for imagem in imagens %}
+    <div class="col-12 col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm">
+            {% if imagem.imagem %}
+            <img src="{{ imagem.imagem.url }}" class="card-img-top" alt="{{ imagem.legenda|default:imagem }}" style="height: 220px; object-fit: cover;">
+            {% endif %}
+            <div class="card-body">
+                <h6 class="card-title">{{ imagem.legenda|default:"Imagem da obra" }}</h6>
+                <p class="card-text text-muted mb-2">
+                    {% if imagem.atualizacao_obra %}
+                        Atualização: {{ imagem.atualizacao_obra.titulo }}
+                    {% else %}
+                        Sem atualização vinculada
+                    {% endif %}
+                </p>
+                <a href="{% url 'imagem_detail' imagem.pk %}" class="btn btn-sm btn-outline-primary">Ver</a>
+                <a href="{% url 'imagem_update' imagem.pk %}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                <a href="{% url 'imagem_delete' imagem.pk %}" class="btn btn-sm btn-outline-danger">Excluir</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-light border mb-0">Nenhuma imagem cadastrada para esta obra.</div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

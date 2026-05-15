@@ -1,0 +1,147 @@
+﻿{% extends "core/base.html" %} {% load static %} {% block title %}Sobre o
+OrcamentoObra{% endblock %} {% block content %}
+<div class="hero-shell rounded-4 p-4 p-md-5 mb-4 shadow-sm">
+  <div class="row align-items-center g-4">
+    <div class="col-lg-7">
+      <h1 class="display-6 fw-semibold mb-3">OrcamentoObra</h1>
+      <p class="lead mb-3">
+        Sistema para gestão de obras, clientes, documentos, imagens,
+        atualizações e orçamentos.
+      </p>
+      <p class="mb-0">
+        Esta página reúne os diagramas do projeto e serve como apresentação
+        inicial do sistema.
+      </p>
+    </div>
+    <div class="col-lg-5">
+      <div class="bg-white text-dark rounded-4 p-4 shadow-sm">
+        <h5 class="fw-semibold mb-2">Sobre o projeto</h5>
+        <p class="text-secondary mb-0">
+          O OrcamentoObra é um sistema web voltado à gestão de obras,
+          documentos, imagens e orçamentos, permitindo que administradores
+          organizem as informações do projeto e que clientes autenticados
+          acompanhem apenas os dados vinculados às suas obras. A aplicação
+          busca centralizar o processo de acompanhamento do serviço, oferecendo
+          mais transparência, melhor organização das informações e maior
+          praticidade na visualização de documentos, atualizações e aprovação
+          de orçamentos.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <div class="col-md-6">
+    <div class="card diagram-card h-100 shadow-sm border-0">
+      <img
+        src="{% static 'images/caso-de-uso.png' %}"
+        class="card-img-top"
+        alt="Diagrama de Caso de Uso"
+      />
+      <div class="card-body d-flex flex-column">
+        <h5 class="card-title">Diagrama de Caso de Uso</h5>
+        <p class="card-text">
+          Visão geral das interações dos atores com o sistema.
+        </p>
+        <div class="mt-auto pt-3">
+          <button
+            type="button"
+            class="btn btn-success"
+            data-bs-toggle="modal"
+            data-bs-target="#modalDiagrama1"
+          >
+            Expandir
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card diagram-card h-100 shadow-sm border-0">
+      <img
+        src="{% static 'images/classe.png' %}"
+        class="card-img-top"
+        alt="Diagrama de Classe"
+      />
+      <div class="card-body d-flex flex-column">
+        <h5 class="card-title">Diagrama de Classe</h5>
+        <p class="card-text">
+          Estrutura das entidades e seus relacionamentos no sistema.
+        </p>
+        <div class="mt-auto pt-3">
+          <button
+            type="button"
+            class="btn btn-success"
+            data-bs-toggle="modal"
+            data-bs-target="#modalDiagrama2"
+          >
+            Expandir
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal fade lightbox-modal"
+  id="modalDiagrama1"
+  tabindex="-1"
+  aria-labelledby="modalDiagrama1Titulo"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-fullscreen">
+    <div class="modal-content">
+      <div class="modal-header px-3 px-md-4">
+        <h5 class="modal-title" id="modalDiagrama1Titulo">
+          Diagrama de Caso de Uso
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Fechar"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <img
+          src="{% static 'images/caso-de-uso.png' %}"
+          alt="Diagrama de Caso de Uso completo"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal fade lightbox-modal"
+  id="modalDiagrama2"
+  tabindex="-1"
+  aria-labelledby="modalDiagrama2Titulo"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-fullscreen">
+    <div class="modal-content">
+      <div class="modal-header px-3 px-md-4">
+        <h5 class="modal-title" id="modalDiagrama2Titulo">
+          Diagrama de Classe
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Fechar"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <img
+          src="{% static 'images/classe.png' %}"
+          alt="Diagrama de Classe completo"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

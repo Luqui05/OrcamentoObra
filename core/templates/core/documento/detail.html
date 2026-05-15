@@ -1,0 +1,22 @@
+{% extends "core/base.html" %}
+
+{% block title %}{{ documento.titulo }}{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">{{ documento.titulo }}</h5>
+        <div>
+            <a href="{% url 'documento_update' documento.pk %}" class="btn btn-sm btn-outline-secondary">Editar</a>
+            <a href="{% url 'documento_delete' documento.pk %}" class="btn btn-sm btn-outline-danger">Excluir</a>
+        </div>
+    </div>
+    <div class="card-body">
+        <p><strong>Tipo:</strong> {{ documento.get_tipo_documento_display }}</p>
+        <p><strong>Descrição:</strong><br>{{ documento.descricao|linebreaks }}</p>
+        {% if documento.arquivo %}
+        <p><a href="{{ documento.arquivo.url }}" target="_blank" class="btn btn-primary">Baixar arquivo</a></p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

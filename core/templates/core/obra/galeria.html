@@ -1,0 +1,276 @@
+{% extends "core/base.html" %}
+
+{% block title %}Galeria da obra{% endblock %}
+
+{% block extra_css %}
+<style>
+    .galeria-wrap {
+        background: #ffffff;
+        border-radius: 0.75rem;
+        overflow: hidden;
+        border: 1px solid #dee2e6;
+        box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.08);
+    }
+
+    .galeria-topo {
+        background: #f8f9fa;
+        color: #212529;
+        border-bottom: 1px solid #dee2e6;
+        padding: 0.75rem 1rem;
+    }
+
+    .galeria-topo .sub {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 0;
+    }
+
+    .galeria-abas {
+        background: #ffffff;
+        border-bottom: 1px solid #dee2e6;
+        padding: 0 1rem;
+    }
+
+    .galeria-abas .nav-link {
+        color: #495057;
+        border: 0;
+        border-bottom: 3px solid transparent;
+        border-radius: 0;
+        padding: 0.75rem 1rem;
+    }
+
+    .galeria-abas .nav-link:hover {
+        color: #0d6efd;
+    }
+
+    .galeria-abas .nav-link.active {
+        color: #0d6efd;
+        background: transparent;
+        border-bottom-color: #0d6efd;
+    }
+
+    .tab-content.galeria-conteudo {
+        background: #ffffff;
+        padding: 0;
+    }
+
+    .galeria-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 1px;
+        background: #e9ecef;
+    }
+
+    .galeria-card {
+        display: flex;
+        flex-direction: column;
+        min-height: 100%;
+        background: #f8f9fa;
+    }
+
+    .galeria-item {
+        position: relative;
+        min-height: 180px;
+        background: #f8f9fa;
+        color: #212529;
+        text-decoration: none;
+    }
+
+    .galeria-item:hover {
+        color: #0d6efd;
+    }
+
+    .galeria-item:focus-visible {
+        outline: 3px solid rgba(13, 110, 253, 0.35);
+        outline-offset: -3px;
+    }
+
+    .galeria-item img {
+        width: 100%;
+        height: 100%;
+        min-height: 180px;
+        object-fit: cover;
+        display: block;
+    }
+
+    .galeria-item .placeholder {
+        width: 100%;
+        min-height: 180px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 0.75rem;
+        background: linear-gradient(160deg, #f8f9fa, #e9ecef);
+        font-size: 0.9rem;
+    }
+
+    .galeria-item .info {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 0.5rem 0.6rem;
+        color: #f8f9fa;
+        background: linear-gradient(to top, rgba(33, 37, 41, 0.78), rgba(33, 37, 41, 0.08));
+        font-size: 0.78rem;
+    }
+
+    .galeria-card .acoes {
+        padding: 0.6rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        border-top: 1px solid #dee2e6;
+        background: #fff;
+    }
+
+    .galeria-card .acoes .btn {
+        flex: 1 1 calc(33.333% - 0.4rem);
+    }
+
+    .galeria-vazia {
+        color: #6c757d;
+        padding: 1.2rem;
+        margin: 0;
+    }
+
+    @media (max-width: 575.98px) {
+        .galeria-abas {
+            padding: 0 0.5rem;
+        }
+
+        .galeria-abas .nav-link {
+            padding: 0.65rem 0.65rem;
+            font-size: 0.92rem;
+        }
+
+        .galeria-grid {
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        }
+
+        .galeria-item,
+        .galeria-item img,
+        .galeria-item .placeholder {
+            min-height: 150px;
+        }
+
+        .galeria-card .acoes .btn {
+            flex: 1 1 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Galeria da obra: {{ obra.titulo }}</h2>
+    <div class="d-flex flex-wrap gap-2 justify-content-end">
+        <a href="{% url 'imagem_create' obra.pk %}" class="btn btn-success">Adicionar imagem</a>
+        <a href="{% url 'documento_create' obra.pk %}" class="btn btn-primary">Adicionar documento</a>
+        <a href="{% url 'obra_detail' obra.pk %}" class="btn btn-outline-secondary">Voltar para detalhe</a>
+    </div>
+</div>
+
+<div class="galeria-wrap">
+    <div class="galeria-topo d-flex justify-content-between align-items-end">
+        <div>
+            <h5 class="mb-1">Mídia</h5>
+            <p class="sub">Itens da obra, incluindo atualizações, documentos e orçamentos</p>
+        </div>
+    </div>
+
+    <div class="galeria-abas">
+        <ul class="nav nav-tabs border-0" id="galeriaTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="midias-tab" data-bs-toggle="tab" data-bs-target="#midias" type="button" role="tab" aria-controls="midias" aria-selected="true">
+                    Mídias
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="documentos-tab" data-bs-toggle="tab" data-bs-target="#documentos" type="button" role="tab" aria-controls="documentos" aria-selected="false">
+                    Documentos
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="orcamentos-tab" data-bs-toggle="tab" data-bs-target="#orcamentos" type="button" role="tab" aria-controls="orcamentos" aria-selected="false">
+                    Orçamentos
+                </button>
+            </li>
+        </ul>
+    </div>
+
+    <div class="tab-content galeria-conteudo" id="galeriaTabsContent">
+        <div class="tab-pane fade show active" id="midias" role="tabpanel" aria-labelledby="midias-tab" tabindex="0">
+            {% if galeria_midias %}
+                <div class="galeria-grid">
+                    {% for item in galeria_midias %}
+                        <div class="galeria-card">
+                            <a href="{{ item.url }}" target="_blank" class="galeria-item" title="Abrir imagem">
+                                <img src="{{ item.url }}" alt="{{ item.titulo }}">
+                                <div class="info">
+                                    <div>{{ item.titulo }}</div>
+                                    <small>{{ item.data|date:"d/m/Y H:i" }}</small>
+                                </div>
+                            </a>
+                            <div class="acoes">
+                                <a href="{% url 'imagem_detail' item.obj.pk %}" class="btn btn-sm btn-outline-primary">Abrir</a>
+                                <a href="{% url 'imagem_update' item.obj.pk %}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                                <a href="{% url 'imagem_delete' item.obj.pk %}" class="btn btn-sm btn-outline-danger">Excluir</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="galeria-vazia">Nenhuma mídia cadastrada para esta obra.</p>
+            {% endif %}
+        </div>
+
+        <div class="tab-pane fade" id="documentos" role="tabpanel" aria-labelledby="documentos-tab" tabindex="0">
+            {% if galeria_documentos %}
+                <div class="galeria-grid">
+                    {% for item in galeria_documentos %}
+                        <a href="{{ item.url }}" target="_blank" class="galeria-item" title="Abrir documento">
+                            <div class="placeholder">
+                                <div>
+                                    <strong>{{ item.titulo }}</strong><br>
+                                    <small>{{ item.descricao|default:"Sem descrição"|truncatechars:70 }}</small>
+                                </div>
+                            </div>
+                            <div class="info">
+                                <div>Documento</div>
+                                <small>{{ item.data|date:"d/m/Y H:i" }}</small>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="galeria-vazia">Nenhum documento cadastrado para esta obra.</p>
+            {% endif %}
+        </div>
+
+        <div class="tab-pane fade" id="orcamentos" role="tabpanel" aria-labelledby="orcamentos-tab" tabindex="0">
+            {% if galeria_orcamentos %}
+                <div class="galeria-grid">
+                    {% for item in galeria_orcamentos %}
+                        <a href="{% url 'orcamento_detail' item.obj.pk %}" class="galeria-item" title="Abrir orçamento">
+                            <div class="placeholder">
+                                <div>
+                                    <strong>{{ item.titulo }}</strong><br>
+                                    <small>{{ item.descricao|default:"Sem descrição"|truncatechars:70 }}</small>
+                                </div>
+                            </div>
+                            <div class="info">
+                                <div>Orçamento</div>
+                                <small>{{ item.data|date:"d/m/Y H:i" }}</small>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="galeria-vazia">Nenhum orçamento com arquivo PDF para esta obra.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

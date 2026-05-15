@@ -1,0 +1,35 @@
+{% extends "core/base.html" %}
+
+{% block title %}{{ imagem.legenda|default:"Imagem da obra" }}{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">{{ imagem.legenda|default:"Imagem da obra" }}</h5>
+        <div>
+            <a href="{% url 'imagem_update' imagem.pk %}" class="btn btn-sm btn-outline-secondary">Editar</a>
+            <a href="{% url 'imagem_delete' imagem.pk %}" class="btn btn-sm btn-outline-danger">Excluir</a>
+        </div>
+    </div>
+    <div class="card-body">
+        {% if imagem.imagem %}
+        <div class="mb-3 text-center">
+            <img src="{{ imagem.imagem.url }}" alt="{{ imagem.legenda|default:imagem }}" class="img-fluid rounded shadow-sm">
+        </div>
+        <p><a href="{{ imagem.imagem.url }}" target="_blank" class="btn btn-primary">Abrir imagem</a></p>
+        {% endif %}
+        <p><strong>Obra:</strong> {{ imagem.obra.titulo }}</p>
+        <p>
+            <strong>Atualização:</strong>
+            {% if imagem.atualizacao_obra %}
+                {{ imagem.atualizacao_obra.titulo }}
+            {% else %}
+                Sem atualização vinculada
+            {% endif %}
+        </p>
+        {% if imagem.legenda %}
+        <p><strong>Legenda:</strong><br>{{ imagem.legenda|linebreaks }}</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -6,12 +6,152 @@ from .views import (
     ClienteDetailView,
     ClienteListView,
     ClienteUpdateView,
+    HomeTemplateView,
+    ObraCreateView,
+    ObraDeleteView,
+    ObraDetailView,
+    ObraGaleriaView,
+    ObraListView,
+    ObraUpdateView,
+    SobreTemplateView,
+    OrcamentoDetailView,
+    OrcamentoCreateView,
+    OrcamentoUpdateView,
+    OrcamentoDeleteView,
+    AtualizacaoObraListView,
+    AtualizacaoObraCreateView,
+    AtualizacaoObraDetailView,
+    AtualizacaoObraUpdateView,
+    AtualizacaoObraDeleteView,
+    DocumentoListView,
+    DocumentoDetailView,
+    DocumentoCreateView,
+    DocumentoUpdateView,
+    DocumentoDeleteView,
+    ImagemObraListView,
+    ImagemObraDetailView,
+    ImagemObraCreateView,
+    ImagemObraUpdateView,
+    ImagemObraDeleteView,
 )
 
 urlpatterns = [
+    path("", HomeTemplateView.as_view(), name="index"),
+    path("sobre/", SobreTemplateView.as_view(), name="sobre"),
+    # Clientes
     path("clientes/", ClienteListView.as_view(), name="cliente_list"),
     path("clientes/novo/", ClienteCreateView.as_view(), name="cliente_create"),
     path("clientes/<int:pk>/", ClienteDetailView.as_view(), name="cliente_detail"),
-    path("clientes/<int:pk>/editar/", ClienteUpdateView.as_view(), name="cliente_update"),
-    path("clientes/<int:pk>/excluir/", ClienteDeleteView.as_view(), name="cliente_delete"),
+    path(
+        "clientes/<int:pk>/editar/", ClienteUpdateView.as_view(), name="cliente_update"
+    ),
+    path(
+        "clientes/<int:pk>/excluir/", ClienteDeleteView.as_view(), name="cliente_delete"
+    ),
+    # Obras
+    path("obras/", ObraListView.as_view(), name="obra_list"),
+    path("obras/nova/", ObraCreateView.as_view(), name="obra_create"),
+    path("obras/<int:pk>/", ObraDetailView.as_view(), name="obra_detail"),
+    path("obras/<int:pk>/galeria/", ObraGaleriaView.as_view(), name="obra_galeria"),
+    path("obras/<int:pk>/editar/", ObraUpdateView.as_view(), name="obra_update"),
+    path("obras/<int:pk>/excluir/", ObraDeleteView.as_view(), name="obra_delete"),
+    
+    # Orcamento
+    path(
+        "orcamentos/<int:pk>/", OrcamentoDetailView.as_view(), name="orcamento_detail"
+    ),
+    path(
+        "obras/<int:obra_pk>/orcamentos/novo/",
+        OrcamentoCreateView.as_view(),
+        name="orcamento_create",
+    ),
+    path(
+        "orcamentos/<int:pk>/editar/",
+        OrcamentoUpdateView.as_view(),
+        name="orcamento_update",
+    ),
+    path(
+        "orcamentos/<int:pk>/excluir/",
+        OrcamentoDeleteView.as_view(),
+        name="orcamento_delete",
+    ),
+    
+    # AtualizacaoObra
+    path(
+        "obra/<int:obra_pk>/atualizacoes/",
+        AtualizacaoObraListView.as_view(),
+        name="atualizacao_list",
+    ),
+    path(
+        "obra/<int:obra_pk>/atualizacao/nova/",
+        AtualizacaoObraCreateView.as_view(),
+        name="atualizacao_create",
+    ),
+    path(
+        "atualizacao/<int:pk>/",
+        AtualizacaoObraDetailView.as_view(),
+        name="atualizacao_detail",
+    ),
+    path(
+        "atualizacao/<int:pk>/editar/",
+        AtualizacaoObraUpdateView.as_view(),
+        name="atualizacao_update",
+    ),
+    path(
+        "atualizacao/<int:pk>/excluir/",
+        AtualizacaoObraDeleteView.as_view(),
+        name="atualizacao_delete",
+    ),
+    # Documentos
+    path(
+        "obras/<int:obra_pk>/documentos/",
+        DocumentoListView.as_view(),
+        name="documento_list",
+    ),
+    path(
+        "obras/<int:obra_pk>/documentos/novo/",
+        DocumentoCreateView.as_view(),
+        name="documento_create",
+    ),
+    path(
+        "documentos/<int:pk>/",
+        DocumentoDetailView.as_view(),
+        name="documento_detail",
+    ),
+    path(
+        "documentos/<int:pk>/editar/",
+        DocumentoUpdateView.as_view(),
+        name="documento_update",
+    ),
+    path(
+        "documentos/<int:pk>/excluir/",
+        DocumentoDeleteView.as_view(),
+        name="documento_delete",
+    ),
+    # Imagens
+    path(
+        "obras/<int:obra_pk>/imagens/",
+        ImagemObraListView.as_view(),
+        name="imagem_list",
+    ),
+    path(
+        "obras/<int:obra_pk>/imagens/nova/",
+        ImagemObraCreateView.as_view(),
+        name="imagem_create",
+    ),
+    path(
+        "imagens/<int:pk>/",
+        ImagemObraDetailView.as_view(),
+        name="imagem_detail",
+    ),
+    path(
+        "imagens/<int:pk>/editar/",
+        ImagemObraUpdateView.as_view(),
+        name="imagem_update",
+    ),
+    path(
+        "imagens/<int:pk>/excluir/",
+        ImagemObraDeleteView.as_view(),
+        name="imagem_delete",
+    ),
 ]

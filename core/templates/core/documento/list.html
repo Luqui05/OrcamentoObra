@@ -1,0 +1,47 @@
+{% extends "core/base.html" %}
+
+{% block title %}Documentos - {{ obra.titulo }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4>Documentos da obra: {{ obra.titulo }}</h4>
+    <a href="{% url 'documento_create' obra.pk %}" class="btn btn-primary">Adicionar documento</a>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Título</th>
+            <th>Tipo</th>
+            <th>Arquivo</th>
+            <th>Data</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for doc in documentos %}
+        <tr>
+            <td>{{ doc.titulo }}</td>
+            <td>{{ doc.get_tipo_documento_display }}</td>
+            <td>
+                {% if doc.arquivo %}
+                <a href="{{ doc.arquivo.url }}" target="_blank">Download</a>
+                {% else %}
+                -
+                {% endif %}
+            </td>
+            <td>{{ doc.data_upload|date:"d/m/Y" }}</td>
+            <td>
+                <a href="{% url 'documento_detail' doc.pk %}" class="btn btn-sm btn-outline-primary">Ver</a>
+                <a href="{% url 'documento_update' doc.pk %}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                <a href="{% url 'documento_delete' doc.pk %}" class="btn btn-sm btn-outline-danger">Excluir</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5">Nenhum documento encontrado.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

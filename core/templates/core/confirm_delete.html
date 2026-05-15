@@ -1,4 +1,5 @@
 ﻿{% extends "core/base.html" %}
+{% load crispy_forms_tags %}
 
 {% block title %}Excluir cliente{% endblock %}
 
@@ -12,7 +13,13 @@
         <form method="post">
             {% csrf_token %}
             <button type="submit" class="btn btn-danger">Excluir</button>
-            <a href="{% url 'cliente_list' %}" class="btn btn-outline-secondary">Cancelar</a>
+            {% if cancel_url %}
+                <a href="{{ cancel_url }}" class="btn btn-outline-secondary">Cancelar</a>
+            {% elif cancel_url_name %}
+                <a href="{% url cancel_url_name %}" class="btn btn-outline-secondary">Cancelar</a>
+            {% else %}
+                <a href="{% url 'cliente_list' %}" class="btn btn-outline-secondary">Cancelar</a>
+            {% endif %}
         </form>
     </div>
 </div>
