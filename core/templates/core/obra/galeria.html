@@ -73,6 +73,11 @@
         color: #0d6efd;
     }
 
+    .galeria-item:focus-visible {
+        outline: 3px solid rgba(13, 110, 253, 0.35);
+        outline-offset: -3px;
+    }
+
     .galeria-item img {
         width: 100%;
         height: 100%;
@@ -109,15 +114,36 @@
         padding: 1.2rem;
         margin: 0;
     }
+
+    @media (max-width: 575.98px) {
+        .galeria-abas {
+            padding: 0 0.5rem;
+        }
+
+        .galeria-abas .nav-link {
+            padding: 0.65rem 0.65rem;
+            font-size: 0.92rem;
+        }
+
+        .galeria-grid {
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        }
+
+        .galeria-item,
+        .galeria-item img,
+        .galeria-item .placeholder {
+            min-height: 150px;
+        }
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="mb-0">Galeria da obra: {{ obra.titulo }}</h2>
-    <div>
-        <a href="{% url 'imagem_create' obra.pk %}" class="btn btn-success me-2">Adicionar imagem</a>
-        <a href="{% url 'documento_create' obra.pk %}" class="btn btn-primary me-2">Adicionar documento</a>
+    <div class="d-flex flex-wrap gap-2 justify-content-end">
+        <a href="{% url 'imagem_create' obra.pk %}" class="btn btn-success">Adicionar imagem</a>
+        <a href="{% url 'documento_create' obra.pk %}" class="btn btn-primary">Adicionar documento</a>
         <a href="{% url 'obra_detail' obra.pk %}" class="btn btn-outline-secondary">Voltar para detalhe</a>
     </div>
 </div>

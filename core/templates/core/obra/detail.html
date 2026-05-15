@@ -2,10 +2,78 @@
 
 {% block title %}Detalhe da obra{% endblock %}
 
+{% block extra_css %}
+<style>
+    .obra-actions .btn {
+        min-width: 110px;
+    }
+
+    .obra-info-card,
+    .obra-section-card {
+        border: 0;
+        border-radius: 1rem;
+        box-shadow: 0 0.5rem 1.5rem rgba(15, 23, 42, 0.08);
+    }
+
+    .obra-carousel-card {
+        border: 0;
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 0.5rem 1.5rem rgba(15, 23, 42, 0.08);
+    }
+
+    .obra-carousel-media {
+        background: #f8fafc;
+        min-height: 240px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .obra-carousel-media img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        min-height: 240px;
+    }
+
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 4.25rem;
+    }
+
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        background-color: rgba(15, 23, 42, 0.75);
+        border-radius: 999px;
+        background-size: 55% 55%;
+        width: 3rem;
+        height: 3rem;
+    }
+
+    @media (max-width: 767.98px) {
+        .obra-actions {
+            width: 100%;
+            gap: 0.5rem;
+        }
+
+        .obra-actions .btn {
+            flex: 1 1 calc(50% - 0.5rem);
+            min-width: 0;
+        }
+
+        .obra-carousel-media,
+        .obra-carousel-media img {
+            min-height: 200px;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="mb-0">Detalhe da obra</h2>
-    <div>
+    <div class="d-flex flex-wrap justify-content-end gap-2 obra-actions">
         <a href="{% url 'obra_galeria' obra.pk %}" class="btn btn-outline-primary">Galeria</a>
         <a href="{% url 'obra_update' obra.pk %}" class="btn btn-outline-secondary">Editar</a>
         <a href="{% url 'obra_delete' obra.pk %}" class="btn btn-outline-danger">Excluir</a>
@@ -13,7 +81,7 @@
     </div>
 </div>
 
-<div class="card shadow-sm mb-4">
+<div class="card obra-info-card mb-4">
     <div class="card-body">
         <p><strong>Título:</strong> {{ obra.titulo }}</p>
         <p><strong>Descrição:</strong> {{ obra.descricao|default:"-" }}</p>
@@ -38,7 +106,7 @@
     <a href="{% url 'orcamento_create' obra.pk %}" class="btn btn-primary">Novo orçamento</a>
 </div>
 
-<div class="card shadow-sm">
+<div class="card obra-section-card">
     <div class="card-body">
         {% if orcamentos %}
             <div class="table-responsive">
@@ -80,20 +148,22 @@
         <a href="{% url 'atualizacao_create' obra.pk %}" class="btn btn-primary">Nova atualização</a>
     </div>
 
-    <div class="card shadow-sm">
+    <div class="card obra-section-card">
         <div class="card-body">
             {% if atualizacoes %}
                 <div id="carouselAtualizacoes" class="carousel slide carousel-dark" data-bs-ride="carousel">
                     <div class="carousel-inner">
                     {% for atualizacao in atualizacoes %}
                         <div class="carousel-item {% if forloop.first %}active{% endif %} py-4">
-                            <div class="card mx-auto shadow-sm" style="max-width: 820px;">
+                            <div class="card mx-auto obra-carousel-card" style="max-width: 920px;">
                                 <div class="row g-0">
                                     <div class="col-md-5">
                                             {% if atualizacao.imagens.first %}
-                                                <img src="{{ atualizacao.imagens.first.imagem.url }}" class="img-fluid rounded-start w-100 h-100 object-fit-cover" alt="Imagem da atualização" style="min-height: 230px; max-height: 280px;">
+                                                <div class="obra-carousel-media h-100">
+                                                    <img src="{{ atualizacao.imagens.first.imagem.url }}" class="img-fluid" alt="Imagem da atualização">
+                                                </div>
                                         {% else %}
-                                            <div class="bg-light text-muted d-flex align-items-center justify-content-center h-100 border-end rounded-start" style="min-height: 230px; max-height: 280px;">
+                                            <div class="obra-carousel-media text-muted border-end">
                                                 <span>Sem imagem</span>
                                             </div>
                                         {% endif %}

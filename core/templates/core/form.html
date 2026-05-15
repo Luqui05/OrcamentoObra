@@ -1,4 +1,5 @@
 ﻿{% extends "core/base.html" %}
+{% load crispy_forms_tags %}
 
 {% block title %}{{ titulo }}{% endblock %}
 
@@ -10,7 +11,7 @@
     <div class="card-body">
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            {{ form.as_p }}
+            {{ form|crispy }}
             <button type="submit" class="btn btn-primary">{{ botao|default:"Salvar" }}</button>
             {% if cancel_url_name %}
                 <a href="{% url cancel_url_name %}" class="btn btn-outline-secondary">Cancelar</a>
