@@ -128,9 +128,11 @@
                                 <td>{{ orcamento.get_status_display }}</td>
                                 <td>{{ orcamento.data_emissao|date:"d/m/Y H:i" }}</td>
                                 <td class="text-end">
-                                    <a href="{% url 'orcamento_detail' orcamento.pk %}" class="btn btn-sm btn-outline-primary">Detalhar</a>
-                                    <a href="{% url 'orcamento_update' orcamento.pk %}" class="btn btn-sm btn-outline-secondary">Editar</a>
-                                    <a href="{% url 'orcamento_delete' orcamento.pk %}" class="btn btn-sm btn-outline-danger">Excluir</a>
+                                        <a href="{% url 'orcamento_detail' orcamento.pk %}" class="btn btn-sm btn-outline-primary">Detalhar</a>
+                                        {% if forloop.first %}
+                                            <a href="{% url 'orcamento_update' orcamento.pk %}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                                        {% endif %}
+                                        <a href="{% url 'orcamento_delete' orcamento.pk %}" class="btn btn-sm btn-outline-danger">Excluir</a>
                                 </td>
                             </tr>
                         {% endfor %}

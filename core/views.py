@@ -1,4 +1,5 @@
 from django.urls import reverse_lazy
+from django.core.exceptions import PermissionDenied
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -413,6 +414,13 @@ class OrcamentoUpdateView(UpdateView):
 
     def get_success_url(self):
         return reverse_lazy("obra_detail", kwargs={"pk": self.object.obra.pk})
+
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        latest = obj.obra.orcamentos.order_by("-data_emissao").first()
+        if not latest or obj.pk != latest.pk:
+            raise PermissionDenied("Somente o orçamento mais recente pode ser editado.")
+        return super().dispatch(request, *args, **kwargs)
 
     extra_context = {
         "titulo": "Editar orçamento",
