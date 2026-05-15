@@ -82,16 +82,31 @@
 <div class="card shadow-sm">
     <div class="card-body">
         {% if atualizacoes %}
-            <div id="carouselAtualizacoes" class="carousel slide" data-bs-ride="carousel">
+            <div id="carouselAtualizacoes" class="carousel slide carousel-dark" data-bs-ride="carousel">
                 <div class="carousel-inner">
                     {% for atualizacao in atualizacoes %}
-                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ atualizacao.titulo }}</h5>
-                                    <h6 class="card-subtitle mb-2 text-muted">Semana {{ atualizacao.semana_referencia }}</h6>
-                                    <p class="card-text">{{ atualizacao.descricao|truncatewords:30 }}</p>
-                                    <a href="{% url 'atualizacao_detail' atualizacao.pk %}" class="btn btn-sm btn-outline-primary">Ver detalhes</a>
+                        <div class="carousel-item {% if forloop.first %}active{% endif %} py-4">
+                            <div class="card mx-auto shadow-sm" style="max-width: 820px;">
+                                <div class="row g-0">
+                                    <div class="col-md-5">
+                                        {% if atualizacao.imagens.first %}
+                                            <img src="{{ atualizacao.imagens.first.arquivo.url }}" class="img-fluid rounded-start w-100 h-100 object-fit-cover" alt="Imagem da atualização" style="min-height: 230px; max-height: 280px;">
+                                        {% else %}
+                                            <div class="bg-light text-muted d-flex align-items-center justify-content-center h-100 border-end rounded-start" style="min-height: 230px; max-height: 280px;">
+                                                <span>Sem imagem</span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-7">
+                                        <div class="card-body d-flex flex-column h-100">
+                                            <h5 class="card-title">{{ atualizacao.titulo }}</h5>
+                                            <h6 class="card-subtitle mb-3 text-muted">Semana {{ atualizacao.semana_referencia }} &bull; {{ atualizacao.data|date:"d/m/Y H:i" }}</h6>
+                                            <p class="card-text flex-grow-1">{{ atualizacao.descricao|truncatewords:25 }}</p>
+                                            <div class="mt-auto">
+                                                <a href="{% url 'atualizacao_detail' atualizacao.pk %}" class="btn btn-sm btn-outline-primary">Ver detalhes</a>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
