@@ -14,7 +14,54 @@ from .forms import (
     ObraForm,
     OrcamentoForm,
 )
-from .models import AtualizacaoObra, Cliente, Obra, Orcamento
+from .forms import DocumentoForm
+from .models import AtualizacaoObra, Cliente, Obra, Orcamento, Documento
+
+
+def montar_galeria_obra(obra):
+    """Monta os itens da galeria unificada (imagens, documentos e orcamentos)."""
+    galeria = []
+
+    for img in obra.imagens.all():
+        if img.imagem:
+            galeria.append(
+                {
+                    "tipo": "imagem",
+                    "titulo": img.legenda or "Imagem",
+                    "descricao": "",
+                    "url": img.imagem.url,
+                    "data": img.data_upload,
+                    "obj": img,
+                }
+            )
+
+    for doc in obra.documentos.all():
+        galeria.append(
+            {
+                "tipo": "documento",
+                "titulo": doc.titulo,
+                "descricao": doc.descricao,
+                "url": doc.arquivo.url,
+                "data": doc.data_upload,
+                "obj": doc,
+            }
+        )
+
+    for orc in obra.orcamentos.all():
+        if orc.arquivo_pdf:
+            galeria.append(
+                {
+                    "tipo": "orcamento",
+                    "titulo": f"Orcamento v{orc.versao}",
+                    "descricao": orc.descricao,
+                    "url": orc.arquivo_pdf.url,
+                    "data": orc.data_emissao,
+                    "obj": orc,
+                }
+            )
+
+    galeria.sort(key=lambda item: item["data"], reverse=True)
+    return galeria
 
 
 class HomeTemplateView(TemplateView):
@@ -93,6 +140,107 @@ class ObraDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context["orcamentos"] = self.object.orcamentos.all()
         context["atualizacoes"] = self.object.atualizacoes.all()
+        return context
+
+
+class ObraGaleriaView(DetailView):
+    model = Obra
+    template_name = "core/obra/galeria.html"
+    context_object_name = "obra"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        galeria_items = montar_galeria_obra(self.object)
+        context["galeria_items"] = galeria_items
+        context["galeria_midias"] = [item for item in galeria_items if item["tipo"] == "imagem"]
+        context["galeria_documentos"] = [item for item in galeria_items if item["tipo"] == "documento"]
+        context["galeria_orcamentos"] = [item for item in galeria_items if item["tipo"] == "orcamento"]
+        return context
+
+
+class DocumentoListView(ListView):
+    model = Documento
+    template_name = "core/documento/list.html"
+    context_object_name = "documentos"
+
+    def get_queryset(self):
+        obra_pk = self.kwargs.get("obra_pk")
+        return Documento.objects.filter(obra__pk=obra_pk)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        obra_pk = self.kwargs.get("obra_pk")
+        context["obra"] = Obra.objects.get(pk=obra_pk)
+        return context
+
+
+class DocumentoDetailView(DetailView):
+    model = Documento
+    template_name = "core/documento/detail.html"
+    context_object_name = "documento"
+
+
+class DocumentoCreateView(CreateView):
+    model = Documento
+    form_class = DocumentoForm
+    template_name = "core/form.html"
+
+    def get_success_url(self):
+        return reverse_lazy("obra_detail", kwargs={"pk": self.object.obra.pk})
+
+    def get_initial(self):
+        initial = super().get_initial()
+        obra_pk = self.kwargs.get("obra_pk")
+        if obra_pk:
+            initial["obra"] = Obra.objects.get(pk=obra_pk)
+        return initial
+
+    def form_valid(self, form):
+        obra_pk = self.kwargs.get("obra_pk")
+        if obra_pk:
+            form.instance.obra = Obra.objects.get(pk=obra_pk)
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "titulo": "Adicionar documento",
+            "botao": "Salvar",
+        })
+        return context
+
+
+class DocumentoUpdateView(UpdateView):
+    model = Documento
+    form_class = DocumentoForm
+    template_name = "core/form.html"
+
+    def get_success_url(self):
+        return reverse_lazy("obra_detail", kwargs={"pk": self.object.obra.pk})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "titulo": "Editar documento",
+            "botao": "Atualizar",
+            "cancel_url": reverse_lazy("obra_detail", kwargs={"pk": self.object.obra.pk}),
+        })
+        return context
+
+
+class DocumentoDeleteView(DeleteView):
+    model = Documento
+    template_name = "core/confirm_delete.html"
+
+    def get_success_url(self):
+        return reverse_lazy("obra_detail", kwargs={"pk": self.object.obra.pk})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "titulo": "Excluir documento",
+            "cancel_url": reverse_lazy("obra_detail", kwargs={"pk": self.object.obra.pk}),
+        })
         return context
 
 

@@ -10,6 +10,7 @@ from .views import (
     ObraCreateView,
     ObraDeleteView,
     ObraDetailView,
+    ObraGaleriaView,
     ObraListView,
     ObraUpdateView,
     SobreTemplateView,
@@ -22,6 +23,11 @@ from .views import (
     AtualizacaoObraDetailView,
     AtualizacaoObraUpdateView,
     AtualizacaoObraDeleteView,
+    DocumentoListView,
+    DocumentoDetailView,
+    DocumentoCreateView,
+    DocumentoUpdateView,
+    DocumentoDeleteView,
 )
 
 urlpatterns = [
@@ -41,6 +47,7 @@ urlpatterns = [
     path("obras/", ObraListView.as_view(), name="obra_list"),
     path("obras/nova/", ObraCreateView.as_view(), name="obra_create"),
     path("obras/<int:pk>/", ObraDetailView.as_view(), name="obra_detail"),
+    path("obras/<int:pk>/galeria/", ObraGaleriaView.as_view(), name="obra_galeria"),
     path("obras/<int:pk>/editar/", ObraUpdateView.as_view(), name="obra_update"),
     path("obras/<int:pk>/excluir/", ObraDeleteView.as_view(), name="obra_delete"),
     
@@ -89,5 +96,31 @@ urlpatterns = [
         "atualizacao/<int:pk>/excluir/",
         AtualizacaoObraDeleteView.as_view(),
         name="atualizacao_delete",
+    ),
+    # Documentos
+    path(
+        "obras/<int:obra_pk>/documentos/",
+        DocumentoListView.as_view(),
+        name="documento_list",
+    ),
+    path(
+        "obras/<int:obra_pk>/documentos/novo/",
+        DocumentoCreateView.as_view(),
+        name="documento_create",
+    ),
+    path(
+        "documentos/<int:pk>/",
+        DocumentoDetailView.as_view(),
+        name="documento_detail",
+    ),
+    path(
+        "documentos/<int:pk>/editar/",
+        DocumentoUpdateView.as_view(),
+        name="documento_update",
+    ),
+    path(
+        "documentos/<int:pk>/excluir/",
+        DocumentoDeleteView.as_view(),
+        name="documento_delete",
     ),
 ]

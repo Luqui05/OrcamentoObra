@@ -6,6 +6,7 @@ from .models import (
     ImagemObra,
     Obra,
     Orcamento,
+    Documento,
 )
 
 
@@ -71,4 +72,15 @@ class AtualizacaoObraForm(forms.ModelForm):
             "titulo": forms.TextInput(attrs={"class": "form-control"}),
             "descricao": forms.Textarea(attrs={"class": "form-control", "rows": 4}),
             "semana_referencia": forms.NumberInput(attrs={"class": "form-control"}),
+        }
+
+class DocumentoForm(forms.ModelForm):
+    class Meta:
+        model = Documento
+        fields = ["titulo", "tipo_documento", "arquivo", "descricao"]
+        widgets = {
+            "titulo": forms.TextInput(attrs={"class": "form-control"}),
+            "tipo_documento": forms.Select(attrs={"class": "form-select"}),
+            "arquivo": forms.FileInput(attrs={"class": "form-control"}),
+            "descricao": forms.Textarea(attrs={"class": "form-control", "rows": 4}),
         }
