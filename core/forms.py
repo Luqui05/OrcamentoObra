@@ -84,3 +84,31 @@ class DocumentoForm(forms.ModelForm):
             "arquivo": forms.FileInput(attrs={"class": "form-control"}),
             "descricao": forms.Textarea(attrs={"class": "form-control", "rows": 4}),
         }
+
+
+class ImagemObraForm(forms.ModelForm):
+    atualizacao_obra = forms.ModelChoiceField(
+        queryset=AtualizacaoObra.objects.none(),
+        required=False,
+        widget=forms.Select(attrs={"class": "form-select"}),
+    )
+
+    class Meta:
+        model = ImagemObra
+        fields = ["atualizacao_obra", "imagem", "legenda"]
+        widgets = {
+            "imagem": forms.FileInput(attrs={"class": "form-control"}),
+            "legenda": forms.TextInput(attrs={"class": "form-control"}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        obra = kwargs.pop("obra", None)
+        super().__init__(*args, **kwargs)
+
+        obra = obra or getattr(self.instance, "obra", None)
+        self._obra = obra
+        if obra:
+            self.instance.obra = obra
+            self.fields["atualizacao_obra"].queryset = AtualizacaoObra.objects.filter(
+                obra=obra
+            )

@@ -28,6 +28,11 @@ from .views import (
     DocumentoCreateView,
     DocumentoUpdateView,
     DocumentoDeleteView,
+    ImagemObraListView,
+    ImagemObraDetailView,
+    ImagemObraCreateView,
+    ImagemObraUpdateView,
+    ImagemObraDeleteView,
 )
 
 urlpatterns = [
@@ -122,5 +127,31 @@ urlpatterns = [
         "documentos/<int:pk>/excluir/",
         DocumentoDeleteView.as_view(),
         name="documento_delete",
+    ),
+    # Imagens
+    path(
+        "obras/<int:obra_pk>/imagens/",
+        ImagemObraListView.as_view(),
+        name="imagem_list",
+    ),
+    path(
+        "obras/<int:obra_pk>/imagens/nova/",
+        ImagemObraCreateView.as_view(),
+        name="imagem_create",
+    ),
+    path(
+        "imagens/<int:pk>/",
+        ImagemObraDetailView.as_view(),
+        name="imagem_detail",
+    ),
+    path(
+        "imagens/<int:pk>/editar/",
+        ImagemObraUpdateView.as_view(),
+        name="imagem_update",
+    ),
+    path(
+        "imagens/<int:pk>/excluir/",
+        ImagemObraDeleteView.as_view(),
+        name="imagem_delete",
     ),
 ]

@@ -158,7 +158,7 @@ class ImagemObra(models.Model):
 
     def clean(self):
         super().clean()
-        if self.atualizacao_obra and self.atualizacao_obra.obra_id != self.obra_id:
+        if self.obra_id and self.atualizacao_obra_id and self.atualizacao_obra.obra_id != self.obra_id:
             raise ValidationError(
                 {
                     "atualizacao_obra": (

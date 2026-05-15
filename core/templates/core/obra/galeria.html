@@ -116,6 +116,7 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="mb-0">Galeria da obra: {{ obra.titulo }}</h2>
     <div>
+        <a href="{% url 'imagem_create' obra.pk %}" class="btn btn-success me-2">Adicionar imagem</a>
         <a href="{% url 'documento_create' obra.pk %}" class="btn btn-primary me-2">Adicionar documento</a>
         <a href="{% url 'obra_detail' obra.pk %}" class="btn btn-outline-secondary">Voltar para detalhe</a>
     </div>
