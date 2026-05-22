@@ -3,49 +3,141 @@
 {% block title %}Painel inicial{% endblock %}
 
 {% block content %}
-<div class="page-heading">
+<div class="page-heading dashboard-heading">
 	<div>
 		<p class="page-kicker">Visao geral</p>
 		<h1 class="h3">Painel Administrativo</h1>
-		<p class="page-subtitle">Acesso rapido aos modulos principais do sistema.</p>
+		<p class="page-subtitle">Acompanhe obras, clientes e orcamentos em uma area central.</p>
+	</div>
+	<div class="d-flex flex-wrap gap-2">
+		<a href="{% url 'cliente_create' %}" class="btn btn-outline-primary">
+			<i class="fas fa-user-plus me-2"></i>Novo cliente
+		</a>
+		<a href="{% url 'obra_create' %}" class="btn btn-primary">
+			<i class="fas fa-plus me-2"></i>Nova obra
+		</a>
 	</div>
 </div>
 
-<div class="row g-4">
-	<div class="col-md-6">
-		<div class="card dashboard-card h-100">
-			<div class="card-body d-flex flex-column">
-				<div class="d-flex justify-content-between align-items-start mb-4">
-					<div>
-						<h5 class="card-title mb-1">Clientes</h5>
-						<p class="card-text mb-0">Gerencie clientes cadastrados no sistema.</p>
-					</div>
-					<span class="dashboard-icon"><i class="fas fa-users"></i></span>
+<section class="dashboard-hero mb-4">
+	<div>
+		<p class="dashboard-hero-label">OrcamentoObra</p>
+		<h2>Controle técnico para acompanhar obras do cadastro ao orçamento.</h2>
+		<p>Centralize dados de clientes, andamento, documentos e propostas para consultar o status do projeto com mais rapidez.</p>
+	</div>
+	<div class="dashboard-hero-actions">
+		<a href="{% url 'obra_list' %}" class="btn btn-light">Ver obras</a>
+		<a href="{% url 'cliente_list' %}" class="btn btn-outline-light">Ver clientes</a>
+	</div>
+</section>
+
+<section class="row g-3 mb-4">
+	<div class="col-sm-6 col-xl-3">
+		<div class="metric-card">
+			<span class="metric-icon"><i class="fas fa-users"></i></span>
+			<p class="metric-label">Clientes</p>
+			<strong>{{ total_clientes }}</strong>
+			<span class="metric-note">cadastros no sistema</span>
+		</div>
+	</div>
+	<div class="col-sm-6 col-xl-3">
+		<div class="metric-card metric-card-blue">
+			<span class="metric-icon"><i class="fas fa-helmet-safety"></i></span>
+			<p class="metric-label">Obras</p>
+			<strong>{{ total_obras }}</strong>
+			<span class="metric-note">projetos acompanhados</span>
+		</div>
+	</div>
+	<div class="col-sm-6 col-xl-3">
+		<div class="metric-card">
+			<span class="metric-icon"><i class="fas fa-file-invoice-dollar"></i></span>
+			<p class="metric-label">Orçamentos</p>
+			<strong>{{ total_orcamentos }}</strong>
+			<span class="metric-note">versões emitidas</span>
+		</div>
+	</div>
+	<div class="col-sm-6 col-xl-3">
+		<div class="metric-card">
+			<span class="metric-icon"><i class="fas fa-clock"></i></span>
+			<p class="metric-label">Pendentes</p>
+			<strong>{{ orcamentos_pendentes }}</strong>
+			<span class="metric-note">aguardando resposta</span>
+		</div>
+	</div>
+</section>
+
+<section class="row g-4">
+	<div class="col-lg-8">
+		<div class="dashboard-panel h-100">
+			<div class="dashboard-panel-header">
+				<div>
+					<p class="page-kicker">Recentes</p>
+					<h2 class="h5">Últimas obras cadastradas</h2>
 				</div>
-				<p class="display-5 fw-bold mb-4">{{ total_clientes }}</p>
-				<div class="mt-auto">
-					<a href="{% url 'cliente_list' %}" class="btn btn-light btn-sm">Ver clientes</a>
+				<a href="{% url 'obra_list' %}" class="btn btn-sm btn-outline-primary">Todas as obras</a>
+			</div>
+
+			{% if obras_recentes %}
+				<div class="recent-list">
+					{% for obra in obras_recentes %}
+						<a href="{% url 'obra_detail' obra.pk %}" class="recent-item">
+							<span class="recent-icon"><i class="fas fa-building"></i></span>
+							<span class="recent-content">
+								<strong>{{ obra.titulo }}</strong>
+								<small>{{ obra.cliente_principal.nome }} &middot; {{ obra.data_cadastro|date:"d/m/Y H:i" }}</small>
+							</span>
+							<i class="fas fa-chevron-right recent-arrow"></i>
+						</a>
+					{% endfor %}
+				</div>
+			{% else %}
+				<div class="empty-state">
+					<i class="fas fa-building-circle-xmark"></i>
+					<p>Nenhuma obra cadastrada ainda.</p>
+					<a href="{% url 'obra_create' %}" class="btn btn-primary btn-sm">Cadastrar primeira obra</a>
+				</div>
+			{% endif %}
+		</div>
+	</div>
+
+	<div class="col-lg-4">
+		<div class="dashboard-panel mb-4">
+			<div class="dashboard-panel-header">
+				<div>
+					<p class="page-kicker">Atalhos</p>
+					<h2 class="h5">Ações rapidas</h2>
+				</div>
+			</div>
+			<div class="quick-actions">
+				<a href="{% url 'cliente_create' %}"><i class="fas fa-user-plus"></i>Cadastrar cliente</a>
+				<a href="{% url 'obra_create' %}"><i class="fas fa-plus"></i>Cadastrar obra</a>
+				<a href="{% url 'cliente_list' %}"><i class="fas fa-address-book"></i>Consultar clientes</a>
+				<a href="{% url 'obra_list' %}"><i class="fas fa-list-check"></i>Consultar obras</a>
+			</div>
+		</div>
+
+		<div class="dashboard-panel">
+			<div class="dashboard-panel-header">
+				<div>
+					<p class="page-kicker">Acervo</p>
+					<h2 class="h5">Conteúdos vinculados</h2>
+				</div>
+			</div>
+			<div class="mini-stats">
+				<div>
+					<span>{{ total_documentos }}</span>
+					<small>Documentos</small>
+				</div>
+				<div>
+					<span>{{ total_imagens }}</span>
+					<small>Imagens</small>
+				</div>
+				<div>
+					<span>{{ total_atualizacoes }}</span>
+					<small>Atualizações</small>
 				</div>
 			</div>
 		</div>
 	</div>
-
-	<div class="col-md-6">
-		<div class="card dashboard-card dashboard-card-soft h-100">
-			<div class="card-body d-flex flex-column">
-				<div class="d-flex justify-content-between align-items-start mb-4">
-					<div>
-						<h5 class="card-title mb-1">Obras</h5>
-						<p class="card-text mb-0 text-muted">Controle obras e seus clientes principais.</p>
-					</div>
-					<span class="dashboard-icon"><i class="fas fa-helmet-safety"></i></span>
-				</div>
-				<p class="display-5 fw-bold mb-4">{{ total_obras }}</p>
-				<div class="mt-auto">
-					<a href="{% url 'obra_list' %}" class="btn btn-primary btn-sm">Ver obras</a>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
+</section>
 {% endblock %}
