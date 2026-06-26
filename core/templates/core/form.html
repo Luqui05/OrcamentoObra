@@ -1,24 +1,25 @@
-﻿{% extends "core/base.html" %}
-{% load crispy_forms_tags %}
-
-{% block title %}{{ titulo }}{% endblock %}
-
-{% block content %}
+﻿{% extends "core/base.html" %} {% load crispy_forms_tags %} {% block title %}{{
+titulo }}{% endblock %} {% block content %}
 <div class="card shadow-sm">
-    <div class="card-header">
-        <h5 class="mb-0">{{ titulo }}</h5>
-    </div>
-    <div class="card-body">
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ form|crispy }}
-            <button type="submit" class="btn btn-primary">{{ botao|default:"Salvar" }}</button>
-            {% if cancel_url_name %}
-                <a href="{% url cancel_url_name %}" class="btn btn-outline-secondary">Cancelar</a>
-            {% else %}
-                <a href="{% url 'cliente_list' %}" class="btn btn-outline-secondary">Cancelar</a>
-            {% endif %}
-        </form>
-    </div>
+  <div class="card-header">
+    <h5 class="mb-0">{{ titulo }}</h5>
+  </div>
+  <div class="card-body">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %} {{ form|crispy }}
+      <button type="submit" class="btn btn-primary">
+        {{ botao|default:"Salvar" }}
+      </button>
+      {% if cancel_url %}
+      <a href="{{ cancel_url }}" class="btn btn-outline-secondary">Cancelar</a>
+      {% elif cancel_url_name %}
+      <a href="{% url cancel_url_name %}" class="btn btn-outline-secondary"
+        >Cancelar</a
+      >
+      {% else %}
+      <a href="{% url 'index' %}" class="btn btn-outline-secondary">Cancelar</a>
+      {% endif %}
+    </form>
+  </div>
 </div>
 {% endblock %}

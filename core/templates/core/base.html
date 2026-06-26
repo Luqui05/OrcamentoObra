@@ -19,7 +19,10 @@
   <body class="sb-nav-fixed">
     <nav class="navbar navbar-expand navbar-dark">
       <div class="container-fluid px-4">
-        <a class="navbar-brand fw-semibold d-flex align-items-center gap-2" href="{% url 'index' %}">
+        <a
+          class="navbar-brand fw-semibold d-flex align-items-center gap-2"
+          href="{% url 'index' %}"
+        >
           <i class="fas fa-building-circle-check"></i>
           <span>OrcamentoObra</span>
         </a>
@@ -36,9 +39,19 @@
             >
               <i class="fas fa-user fa-fw"></i>
             </a>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-              <li><a class="dropdown-item" href="{% url 'index' %}">Início</a></li>
-              <li><a class="dropdown-item" href="{% url 'sobre' %}">Sobre</a></li>
+            <ul
+              class="dropdown-menu dropdown-menu-end"
+              aria-labelledby="navbarDropdown"
+            >
+              {% if user.is_authenticated %}
+              <li>
+                <a class="dropdown-item" href="{% url 'index' %}">Início</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'password_change' %}"
+                  >Alterar senha</a
+                >
+              </li>
               <li><hr class="dropdown-divider" /></li>
               <li>
                 <form method="post" action="{% url 'logout' %}" class="m-0">
@@ -46,6 +59,16 @@
                   <button type="submit" class="dropdown-item">Sair</button>
                 </form>
               </li>
+              {% else %}
+              <li>
+                <a class="dropdown-item" href="{% url 'login' %}">Entrar</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'cadastro_usuario' %}"
+                  >Cadastrar</a
+                >
+              </li>
+              {% endif %}
             </ul>
           </li>
         </ul>
@@ -58,7 +81,9 @@
 
     <footer class="py-4 mt-auto border-top">
       <div class="container-fluid px-4">
-        <div class="d-flex align-items-center justify-content-between small text-muted">
+        <div
+          class="d-flex align-items-center justify-content-between small text-muted"
+        >
           <div>OrcamentoObra</div>
           <div>Sistema acadêmico de gestão de obras e orçamentos</div>
         </div>
