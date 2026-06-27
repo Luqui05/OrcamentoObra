@@ -1,6 +1,10 @@
-﻿{% extends "core/base.html" %} {% block title %}Entrar | OrcamentoObra{%
-endblock %} {% block main_class %}container auth-main auth-wrap d-flex
-align-items-center justify-content-center py-4{% endblock %} {% block content %}
+{% extends "core/base.html" %}
+
+{% block title %}Entrar | OrcamentoObra{% endblock %}
+
+{% block main_class %}container auth-main auth-wrap d-flex align-items-center justify-content-center py-4{% endblock %}
+
+{% block content %}
 <div class="row justify-content-center w-100">
   <div class="col-lg-5 col-md-8">
     <div class="text-center mb-3">
@@ -12,12 +16,16 @@ align-items-center justify-content-center py-4{% endblock %} {% block content %}
       <div class="card-header bg-white border-0 pt-4 pb-1"></div>
       <div class="card-body p-4">
         <form method="post">
-          {% csrf_token %} {% if form.non_field_errors %}
-          <div class="alert alert-danger" role="alert">
-            {{ form.non_field_errors }}
-          </div>
-          {% endif %} {% if next %}
-          <input type="hidden" name="next" value="{{ next }}" />
+          {% csrf_token %}
+
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger" role="alert">
+              {{ form.non_field_errors }}
+            </div>
+          {% endif %}
+
+          {% if next %}
+            <input type="hidden" name="next" value="{{ next }}" />
           {% endif %}
 
           <div class="form-floating mb-3">
