@@ -1,11 +1,12 @@
 from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 from core.forms import AtualizacaoObraForm
 from core.models import AtualizacaoObra, Obra
 
 
-class AtualizacaoObraListView(ListView):
+class AtualizacaoObraListView(LoginRequiredMixin, ListView):
     model = AtualizacaoObra
     template_name = "core/atualizacao/list.html"
     context_object_name = "atualizacoes"
@@ -21,13 +22,13 @@ class AtualizacaoObraListView(ListView):
         return context
 
 
-class AtualizacaoObraDetailView(DetailView):
+class AtualizacaoObraDetailView(LoginRequiredMixin, DetailView):
     model = AtualizacaoObra
     template_name = "core/atualizacao/detail.html"
     context_object_name = "atualizacao"
 
 
-class AtualizacaoObraCreateView(CreateView):
+class AtualizacaoObraCreateView(LoginRequiredMixin, CreateView):
     model = AtualizacaoObra
     form_class = AtualizacaoObraForm
     template_name = "core/form.html"
@@ -53,7 +54,7 @@ class AtualizacaoObraCreateView(CreateView):
         return context
 
 
-class AtualizacaoObraUpdateView(UpdateView):
+class AtualizacaoObraUpdateView(LoginRequiredMixin, UpdateView):
     model = AtualizacaoObra
     form_class = AtualizacaoObraForm
     template_name = "core/form.html"
@@ -75,7 +76,7 @@ class AtualizacaoObraUpdateView(UpdateView):
         return context
 
 
-class AtualizacaoObraDeleteView(DeleteView):
+class AtualizacaoObraDeleteView(LoginRequiredMixin, DeleteView):
     model = AtualizacaoObra
     template_name = "core/confirm_delete.html"
 

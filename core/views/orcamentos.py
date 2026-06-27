@@ -1,4 +1,5 @@
 from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.views.generic import DetailView, CreateView, UpdateView, DeleteView
 
@@ -6,13 +7,13 @@ from core.forms import OrcamentoForm
 from core.models import Orcamento, Obra
 
 
-class OrcamentoDetailView(DetailView):
+class OrcamentoDetailView(LoginRequiredMixin, DetailView):
     model = Orcamento
     template_name = "core/orcamento/detail.html"
     context_object_name = "orcamento"
 
 
-class OrcamentoCreateView(CreateView):
+class OrcamentoCreateView(LoginRequiredMixin, CreateView):
     model = Orcamento
     form_class = OrcamentoForm
     template_name = "core/form.html"
@@ -46,7 +47,7 @@ class OrcamentoCreateView(CreateView):
     }
 
 
-class OrcamentoUpdateView(UpdateView):
+class OrcamentoUpdateView(LoginRequiredMixin, UpdateView):
     model = Orcamento
     form_class = OrcamentoForm
     template_name = "core/form.html"
@@ -67,7 +68,7 @@ class OrcamentoUpdateView(UpdateView):
     }
 
 
-class OrcamentoDeleteView(DeleteView):
+class OrcamentoDeleteView(LoginRequiredMixin, DeleteView):
     model = Orcamento
     template_name = "core/confirm_delete.html"
 

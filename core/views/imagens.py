@@ -1,11 +1,12 @@
 from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 from core.forms import ImagemObraForm
 from core.models import ImagemObra, Obra
 
 
-class ImagemObraListView(ListView):
+class ImagemObraListView(LoginRequiredMixin, ListView):
     model = ImagemObra
     template_name = "core/imagem/list.html"
     context_object_name = "imagens"
@@ -21,13 +22,13 @@ class ImagemObraListView(ListView):
         return context
 
 
-class ImagemObraDetailView(DetailView):
+class ImagemObraDetailView(LoginRequiredMixin, DetailView):
     model = ImagemObra
     template_name = "core/imagem/detail.html"
     context_object_name = "imagem"
 
 
-class ImagemObraCreateView(CreateView):
+class ImagemObraCreateView(LoginRequiredMixin, CreateView):
     model = ImagemObra
     form_class = ImagemObraForm
     template_name = "core/form.html"
@@ -57,7 +58,7 @@ class ImagemObraCreateView(CreateView):
         return context
 
 
-class ImagemObraUpdateView(UpdateView):
+class ImagemObraUpdateView(LoginRequiredMixin, UpdateView):
     model = ImagemObra
     form_class = ImagemObraForm
     template_name = "core/form.html"
@@ -80,7 +81,7 @@ class ImagemObraUpdateView(UpdateView):
         return context
 
 
-class ImagemObraDeleteView(DeleteView):
+class ImagemObraDeleteView(LoginRequiredMixin, DeleteView):
     model = ImagemObra
     template_name = "core/confirm_delete.html"
 

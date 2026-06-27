@@ -1,4 +1,5 @@
 from django.views.generic import TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from core.models import (
     AtualizacaoObra,
@@ -10,7 +11,7 @@ from core.models import (
 )
 
 
-class HomeTemplateView(TemplateView):
+class HomeTemplateView(LoginRequiredMixin, TemplateView):
     template_name = "core/index.html"
 
     def get_context_data(self, **kwargs):

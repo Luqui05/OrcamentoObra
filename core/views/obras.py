@@ -1,4 +1,5 @@
 from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 from core.forms import ObraForm
@@ -6,13 +7,13 @@ from core.models import Obra
 from core.utils import montar_galeria_obra
 
 
-class ObraListView(ListView):
+class ObraListView(LoginRequiredMixin, ListView):
     model = Obra
     template_name = "core/obra/list.html"
     context_object_name = "obras"
 
 
-class ObraDetailView(DetailView):
+class ObraDetailView(LoginRequiredMixin, DetailView):
     model = Obra
     template_name = "core/obra/detail.html"
     context_object_name = "obra"
@@ -24,7 +25,7 @@ class ObraDetailView(DetailView):
         return context
 
 
-class ObraGaleriaView(DetailView):
+class ObraGaleriaView(LoginRequiredMixin, DetailView):
     model = Obra
     template_name = "core/obra/galeria.html"
     context_object_name = "obra"
@@ -39,7 +40,7 @@ class ObraGaleriaView(DetailView):
         return context
 
 
-class ObraCreateView(CreateView):
+class ObraCreateView(LoginRequiredMixin, CreateView):
     model = Obra
     form_class = ObraForm
     template_name = "core/form.html"
@@ -52,7 +53,7 @@ class ObraCreateView(CreateView):
     }
 
 
-class ObraUpdateView(UpdateView):
+class ObraUpdateView(LoginRequiredMixin, UpdateView):
     model = Obra
     form_class = ObraForm
     template_name = "core/form.html"
@@ -65,7 +66,7 @@ class ObraUpdateView(UpdateView):
     }
 
 
-class ObraDeleteView(DeleteView):
+class ObraDeleteView(LoginRequiredMixin, DeleteView):
     model = Obra
     template_name = "core/confirm_delete.html"
     success_url = reverse_lazy("obra_list")

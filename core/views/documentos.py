@@ -1,11 +1,12 @@
 from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 from core.forms import DocumentoForm
 from core.models import Documento, Obra
 
 
-class DocumentoListView(ListView):
+class DocumentoListView(LoginRequiredMixin, ListView):
     model = Documento
     template_name = "core/documento/list.html"
     context_object_name = "documentos"
@@ -21,13 +22,13 @@ class DocumentoListView(ListView):
         return context
 
 
-class DocumentoDetailView(DetailView):
+class DocumentoDetailView(LoginRequiredMixin, DetailView):
     model = Documento
     template_name = "core/documento/detail.html"
     context_object_name = "documento"
 
 
-class DocumentoCreateView(CreateView):
+class DocumentoCreateView(LoginRequiredMixin, CreateView):
     model = Documento
     form_class = DocumentoForm
     template_name = "core/form.html"
@@ -57,7 +58,7 @@ class DocumentoCreateView(CreateView):
         return context
 
 
-class DocumentoUpdateView(UpdateView):
+class DocumentoUpdateView(LoginRequiredMixin, UpdateView):
     model = Documento
     form_class = DocumentoForm
     template_name = "core/form.html"
@@ -75,7 +76,7 @@ class DocumentoUpdateView(UpdateView):
         return context
 
 
-class DocumentoDeleteView(DeleteView):
+class DocumentoDeleteView(LoginRequiredMixin, DeleteView):
     model = Documento
     template_name = "core/confirm_delete.html"
 
