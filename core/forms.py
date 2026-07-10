@@ -13,9 +13,8 @@ from .models import (
 class ClienteForm(forms.ModelForm):
     class Meta:
         model = Cliente
-        fields = ["usuario", "nome", "cpf", "telefone", "ativo"]
+        fields = ["nome", "cpf", "telefone", "ativo"]
         widgets = {
-            "usuario": forms.Select(attrs={"class": "form-select"}),
             "nome": forms.TextInput(attrs={"class": "form-control"}),
             "cpf": forms.TextInput(attrs={"class": "form-control"}),
             "telefone": forms.TextInput(attrs={"class": "form-control"}),
@@ -24,6 +23,15 @@ class ClienteForm(forms.ModelForm):
 
 
 class ObraForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        usuario = kwargs.pop("usuario", None)
+        super().__init__(*args, **kwargs)
+
+        if usuario is not None:
+            clientes = Cliente.objects.filter(usuario=usuario)
+            self.fields["clientes"].queryset = clientes
+            self.fields["cliente_principal"].queryset = clientes
+
     class Meta:
         model = Obra
         fields = ["titulo", "descricao", "endereco", "clientes", "cliente_principal"]

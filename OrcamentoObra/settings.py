@@ -178,3 +178,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Crispy Forms (usar bootstrap5)
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+# config de e-mail em desenvolvimento
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

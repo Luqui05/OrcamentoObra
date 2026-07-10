@@ -1,70 +1,73 @@
-﻿{% extends "core/base.html" %}
+{% extends "core/base.html" %}
 
 {% block title %}Entrar | OrcamentoObra{% endblock %}
-
-{% block extra_css %}
-  <style>
-    .auth-wrap {
-      min-height: calc(100vh - var(--oo-header-height) - 90px);
-    }
-
-    .auth-card {
-      border: 0;
-      border-radius: 1rem;
-    }
-  </style>
-{% endblock %}
 
 {% block main_class %}container auth-main auth-wrap d-flex align-items-center justify-content-center py-4{% endblock %}
 
 {% block content %}
-  <div class="row justify-content-center w-100">
-    <div class="col-lg-5 col-md-8">
-      <div class="text-center mb-3">
-        <h1 class="h4 mb-1">OrcamentoObra</h1>
-        <p class="small mb-0 text-muted">Acesse sua conta para continuar</p>
-      </div>
+<div class="row justify-content-center w-100">
+  <div class="col-lg-5 col-md-8">
+    <div class="text-center mb-3">
+      <h1 class="h4 mb-1">OrcamentoObra</h1>
+      <p class="small mb-0 text-muted">Acesse sua conta para continuar</p>
+    </div>
 
-      <div class="card auth-card shadow-lg">
-        <div class="card-header bg-white border-0 pt-4 pb-1">
-        </div>
-        <div class="card-body p-4">
-          <form method="post">
-            {% csrf_token %}
+    <div class="card auth-card shadow-lg">
+      <div class="card-header bg-white border-0 pt-4 pb-1"></div>
+      <div class="card-body p-4">
+        <form method="post">
+          {% csrf_token %}
 
-            {% if form.non_field_errors %}
-              <div class="alert alert-danger" role="alert">
-                {{ form.non_field_errors }}
-              </div>
-            {% endif %}
-
-            {% if next %}
-              <input type="hidden" name="next" value="{{ next }}" />
-            {% endif %}
-
-            <div class="form-floating mb-3">
-              <input class="form-control" id="id_username" name="username" type="text" placeholder="Usuario" required autofocus>
-              <label for="id_username">Usuario</label>
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger" role="alert">
+              {{ form.non_field_errors }}
             </div>
+          {% endif %}
 
-            <div class="form-floating mb-3">
-              <input class="form-control" id="id_password" name="password" type="password" placeholder="Senha" required>
-              <label for="id_password">Senha</label>
-            </div>
+          {% if next %}
+            <input type="hidden" name="next" value="{{ next }}" />
+          {% endif %}
 
-            <div class="d-grid mt-4">
-              <button class="btn btn-primary" type="submit">Entrar</button>
-            </div>
-          </form>
-        </div>
-        <div class="card-footer bg-white text-center py-3">
-          <div class="small">
-            <a href="{% url 'cadastro_usuario' %}">Nao tem conta? Cadastre-se</a>
-            <span class="mx-2 text-muted">|</span>
-            <a href="{% url 'sobre' %}">Voltar para inicio</a>
+          <div class="form-floating mb-3">
+            <input
+              class="form-control"
+              id="id_username"
+              name="username"
+              type="text"
+              placeholder="Usuário"
+              required
+              autofocus
+            />
+            <label for="id_username">Usuário</label>
           </div>
+
+          <div class="form-floating mb-3">
+            <input
+              class="form-control"
+              id="id_password"
+              name="password"
+              type="password"
+              placeholder="Senha"
+              required
+            />
+            <label for="id_password">Senha</label>
+          </div>
+
+          <div class="d-grid mt-4">
+            <button class="btn btn-primary" type="submit">Entrar</button>
+          </div>
+        </form>
+      </div>
+      <div class="card-footer bg-white text-center py-3">
+        <div class="small">
+          <a href="{% url 'password_reset' %}">Esqueci minha senha</a>
+          <span class="mx-2 text-muted">|</span>
+          <a href="{% url 'cadastro_usuario' %}">Nao tem conta? Cadastre-se</a>
+          <span class="mx-2 text-muted">|</span>
+          <a href="{% url 'sobre' %}">Voltar para início</a>
         </div>
       </div>
     </div>
   </div>
+</div>
 {% endblock %}
