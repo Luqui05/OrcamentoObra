@@ -2,15 +2,23 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.views.generic import DetailView, CreateView, UpdateView, DeleteView
+from django.db.models import Q
+from django.shortcuts import get_object_or_404
 
 from core.forms import OrcamentoForm
 from core.models import Orcamento, Obra
+from core.views.mixins import UserScopedQuerySetMixin
 
 
-class OrcamentoDetailView(LoginRequiredMixin, DetailView):
+class OrcamentoDetailView(LoginRequiredMixin, UserScopedQuerySetMixin, DetailView):
     model = Orcamento
     template_name = "core/orcamento/detail.html"
     context_object_name = "orcamento"
+    
+    def get_user_filter(self):
+        return Q(obra__cliente_principal__usuario=self.request.user) | Q(
+            obra__clientes__usuario=self.request.user
+        )
 
 
 class OrcamentoCreateView(LoginRequiredMixin, CreateView):
@@ -18,20 +26,24 @@ class OrcamentoCreateView(LoginRequiredMixin, CreateView):
     form_class = OrcamentoForm
     template_name = "core/form.html"
 
+    def get_obra(self):
+        return get_object_or_404(
+            Obra,
+            Q(cliente_principal__usuario=self.request.user)
+            | Q(clientes__usuario=self.request.user),
+            pk=self.kwargs["obra_pk"],
+        )
+
     def get_success_url(self):
         return reverse_lazy("obra_detail", kwargs={"pk": self.object.obra.pk})
 
     def get_initial(self):
         initial = super().get_initial()
-        obra_pk = self.kwargs.get("obra_pk")
-        if obra_pk:
-            initial["obra"] = Obra.objects.get(pk=obra_pk)
+        initial["obra"] = self.get_obra()
         return initial
 
     def form_valid(self, form):
-        obra_pk = self.kwargs.get("obra_pk")
-        if obra_pk:
-            form.instance.obra = Obra.objects.get(pk=obra_pk)
+        form.instance.obra = self.get_obra()
         response = super().form_valid(form)
 
         # Marcar orçamentos anteriores da mesma obra como RECUSADO
@@ -47,7 +59,7 @@ class OrcamentoCreateView(LoginRequiredMixin, CreateView):
     }
 
 
-class OrcamentoUpdateView(LoginRequiredMixin, UpdateView):
+class OrcamentoUpdateView(LoginRequiredMixin, UserScopedQuerySetMixin, UpdateView):
     model = Orcamento
     form_class = OrcamentoForm
     template_name = "core/form.html"
@@ -66,9 +78,14 @@ class OrcamentoUpdateView(LoginRequiredMixin, UpdateView):
         "titulo": "Editar orçamento",
         "botao": "Atualizar",
     }
+    
+    def get_user_filter(self):
+        return Q(obra__cliente_principal__usuario=self.request.user) | Q(
+            obra__clientes__usuario=self.request.user
+        )
 
 
-class OrcamentoDeleteView(LoginRequiredMixin, DeleteView):
+class OrcamentoDeleteView(LoginRequiredMixin, UserScopedQuerySetMixin, DeleteView):
     model = Orcamento
     template_name = "core/confirm_delete.html"
 
@@ -82,3 +99,8 @@ class OrcamentoDeleteView(LoginRequiredMixin, DeleteView):
             "obra_detail", kwargs={"pk": self.object.obra.pk}
         )
         return context
+    
+    def get_user_filter(self):
+        return Q(obra__cliente_principal__usuario=self.request.user) | Q(
+            obra__clientes__usuario=self.request.user
+        )

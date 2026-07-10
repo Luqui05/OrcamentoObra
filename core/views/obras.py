@@ -1,19 +1,32 @@
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import (
+    ListView,
+    DetailView,
+    CreateView,
+    UpdateView,
+    DeleteView,
+)
+from django.db.models import Q
 
 from core.forms import ObraForm
 from core.models import Obra
 from core.utils import montar_galeria_obra
+from core.views.mixins import UserScopedQuerySetMixin
 
 
-class ObraListView(LoginRequiredMixin, ListView):
+class ObraListView(LoginRequiredMixin, UserScopedQuerySetMixin, ListView):
     model = Obra
     template_name = "core/obra/list.html"
     context_object_name = "obras"
 
+    def get_user_filter(self):
+        return Q(cliente_principal__usuario=self.request.user) | Q(
+            clientes__usuario=self.request.user
+        )
 
-class ObraDetailView(LoginRequiredMixin, DetailView):
+
+class ObraDetailView(LoginRequiredMixin, UserScopedQuerySetMixin, DetailView):
     model = Obra
     template_name = "core/obra/detail.html"
     context_object_name = "obra"
@@ -23,9 +36,14 @@ class ObraDetailView(LoginRequiredMixin, DetailView):
         context["orcamentos"] = self.object.orcamentos.all()
         context["atualizacoes"] = self.object.atualizacoes.all()
         return context
+    
+    def get_user_filter(self):
+        return Q(cliente_principal__usuario=self.request.user) | Q(
+            clientes__usuario=self.request.user
+        )
 
 
-class ObraGaleriaView(LoginRequiredMixin, DetailView):
+class ObraGaleriaView(LoginRequiredMixin, UserScopedQuerySetMixin, DetailView):
     model = Obra
     template_name = "core/obra/galeria.html"
     context_object_name = "obra"
@@ -34,10 +52,21 @@ class ObraGaleriaView(LoginRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         galeria_items = montar_galeria_obra(self.object)
         context["galeria_items"] = galeria_items
-        context["galeria_midias"] = [item for item in galeria_items if item["tipo"] == "imagem"]
-        context["galeria_documentos"] = [item for item in galeria_items if item["tipo"] == "documento"]
-        context["galeria_orcamentos"] = [item for item in galeria_items if item["tipo"] == "orcamento"]
+        context["galeria_midias"] = [
+            item for item in galeria_items if item["tipo"] == "imagem"
+        ]
+        context["galeria_documentos"] = [
+            item for item in galeria_items if item["tipo"] == "documento"
+        ]
+        context["galeria_orcamentos"] = [
+            item for item in galeria_items if item["tipo"] == "orcamento"
+        ]
         return context
+
+    def get_user_filter(self):
+        return Q(cliente_principal__usuario=self.request.user) | Q(
+            clientes__usuario=self.request.user
+        )
 
 
 class ObraCreateView(LoginRequiredMixin, CreateView):
@@ -46,6 +75,11 @@ class ObraCreateView(LoginRequiredMixin, CreateView):
     template_name = "core/form.html"
     success_url = reverse_lazy("obra_list")
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["usuario"] = self.request.user
+        return kwargs
+
     extra_context = {
         "titulo": "Cadastrar obra",
         "botao": "Salvar",
@@ -53,20 +87,30 @@ class ObraCreateView(LoginRequiredMixin, CreateView):
     }
 
 
-class ObraUpdateView(LoginRequiredMixin, UpdateView):
+class ObraUpdateView(LoginRequiredMixin, UserScopedQuerySetMixin, UpdateView):
     model = Obra
     form_class = ObraForm
     template_name = "core/form.html"
     success_url = reverse_lazy("obra_list")
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["usuario"] = self.request.user
+        return kwargs
 
     extra_context = {
         "titulo": "Editar obra",
         "botao": "Atualizar",
         "cancel_url_name": "obra_list",
     }
+    
+    def get_user_filter(self):
+        return Q(cliente_principal__usuario=self.request.user) | Q(
+            clientes__usuario=self.request.user
+        )
 
 
-class ObraDeleteView(LoginRequiredMixin, DeleteView):
+class ObraDeleteView(LoginRequiredMixin, UserScopedQuerySetMixin, DeleteView):
     model = Obra
     template_name = "core/confirm_delete.html"
     success_url = reverse_lazy("obra_list")
@@ -75,3 +119,8 @@ class ObraDeleteView(LoginRequiredMixin, DeleteView):
         "titulo": "Excluir obra",
         "cancel_url_name": "obra_list",
     }
+    
+    def get_user_filter(self):
+        return Q(cliente_principal__usuario=self.request.user) | Q(
+            clientes__usuario=self.request.user
+        )
