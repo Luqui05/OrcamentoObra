@@ -1,5 +1,4 @@
 from django.urls import reverse_lazy
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.views.generic import DetailView, CreateView, UpdateView, DeleteView
 from django.db.models import Q
@@ -7,10 +6,16 @@ from django.shortcuts import get_object_or_404
 
 from core.forms import OrcamentoForm
 from core.models import Orcamento, Obra
-from core.views.mixins import UserScopedQuerySetMixin
+from core.views.mixins import (
+    ClienteGroupRequiredMixin,
+    LoginRequiredMixin,
+    UserScopedQuerySetMixin,
+)
 
 
-class OrcamentoDetailView(LoginRequiredMixin, UserScopedQuerySetMixin, DetailView):
+class OrcamentoDetailView(
+    LoginRequiredMixin, ClienteGroupRequiredMixin, UserScopedQuerySetMixin, DetailView
+):
     model = Orcamento
     template_name = "core/orcamento/detail.html"
     context_object_name = "orcamento"
@@ -21,7 +26,7 @@ class OrcamentoDetailView(LoginRequiredMixin, UserScopedQuerySetMixin, DetailVie
         )
 
 
-class OrcamentoCreateView(LoginRequiredMixin, CreateView):
+class OrcamentoCreateView(LoginRequiredMixin, ClienteGroupRequiredMixin, CreateView):
     model = Orcamento
     form_class = OrcamentoForm
     template_name = "core/form.html"
@@ -59,7 +64,9 @@ class OrcamentoCreateView(LoginRequiredMixin, CreateView):
     }
 
 
-class OrcamentoUpdateView(LoginRequiredMixin, UserScopedQuerySetMixin, UpdateView):
+class OrcamentoUpdateView(
+    LoginRequiredMixin, ClienteGroupRequiredMixin, UserScopedQuerySetMixin, UpdateView
+):
     model = Orcamento
     form_class = OrcamentoForm
     template_name = "core/form.html"
@@ -85,7 +92,9 @@ class OrcamentoUpdateView(LoginRequiredMixin, UserScopedQuerySetMixin, UpdateVie
         )
 
 
-class OrcamentoDeleteView(LoginRequiredMixin, UserScopedQuerySetMixin, DeleteView):
+class OrcamentoDeleteView(
+    LoginRequiredMixin, ClienteGroupRequiredMixin, UserScopedQuerySetMixin, DeleteView
+):
     model = Orcamento
     template_name = "core/confirm_delete.html"
 

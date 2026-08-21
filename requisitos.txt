@@ -1,0 +1,10 @@
+Criar os templates para todas as views do tipo ListView (com exceção daquelas que não precisam devido a regra de negócio do projeto)
+Criar as urls para realizar: login, logout e alteração de senha
+Controlar o acesso às views com autenticação do usuário (LoginRequiredMixin quando necessário conforme regras de negócio do projeto)
+Utilizar o “request.user.is_autenthicated” para deixar o conteúdo dinâmico nos templates HTML (nos menus, por exemplo)
+Relacionar e filtrar objetos por usuário utilizando os métodos form_valid() e get_queryset() nas views (quando a respectiva classe tiver relação com User de chave estrangeira):
+inserir - “guardar” o User no atributo de chave estrangeira
+editar - permitir que o User só edite seus registros
+excluir - permitir que o User só exclua seus registros
+listar - listar somente os objetos que o User cadastrou
+detalhar - exibir somente o objeto que o User cadastrou

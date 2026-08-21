@@ -1,5 +1,16 @@
+from braces.views import GroupRequiredMixin, LoginRequiredMixin
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Q
+
+from usuarios.constants import CLIENTE_GROUP_NAME
+
+
+class ClienteGroupRequiredMixin(GroupRequiredMixin):
+    """Restringe as views do domínio aos usuários do grupo Clientes."""
+
+    group_required = CLIENTE_GROUP_NAME
+    raise_exception = True
+    redirect_unauthenticated_users = True
 
 
 class UserScopedQuerySetMixin:

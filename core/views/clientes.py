@@ -1,27 +1,35 @@
 from django.urls import reverse_lazy
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 from core.forms import ClienteForm
 from core.models import Cliente
-from core.views.mixins import UserScopedQuerySetMixin
+from core.views.mixins import (
+    ClienteGroupRequiredMixin,
+    LoginRequiredMixin,
+    UserScopedQuerySetMixin,
+)
 
 
-class ClienteListView(LoginRequiredMixin, UserScopedQuerySetMixin, ListView):
+class ClienteListView(
+    LoginRequiredMixin, ClienteGroupRequiredMixin, UserScopedQuerySetMixin, ListView
+):
     model = Cliente
     template_name = "core/cliente/list.html"
     context_object_name = "clientes"
     user_filter = "usuario"
+    paginate_by = 10
 
 
-class ClienteDetailView(LoginRequiredMixin, UserScopedQuerySetMixin, DetailView):
+class ClienteDetailView(
+    LoginRequiredMixin, ClienteGroupRequiredMixin, UserScopedQuerySetMixin, DetailView
+):
     model = Cliente
     template_name = "core/cliente/detail.html"
     context_object_name = "cliente"
     user_filter = "usuario"
 
 
-class ClienteCreateView(LoginRequiredMixin, CreateView):
+class ClienteCreateView(LoginRequiredMixin, ClienteGroupRequiredMixin, CreateView):
     model = Cliente
     form_class = ClienteForm
     template_name = "core/form.html"
@@ -37,7 +45,9 @@ class ClienteCreateView(LoginRequiredMixin, CreateView):
     }
 
 
-class ClienteUpdateView(LoginRequiredMixin, UserScopedQuerySetMixin, UpdateView):
+class ClienteUpdateView(
+    LoginRequiredMixin, ClienteGroupRequiredMixin, UserScopedQuerySetMixin, UpdateView
+):
     model = Cliente
     form_class = ClienteForm
     template_name = "core/form.html"
@@ -50,7 +60,9 @@ class ClienteUpdateView(LoginRequiredMixin, UserScopedQuerySetMixin, UpdateView)
     }
 
 
-class ClienteDeleteView(LoginRequiredMixin, UserScopedQuerySetMixin, DeleteView):
+class ClienteDeleteView(
+    LoginRequiredMixin, ClienteGroupRequiredMixin, UserScopedQuerySetMixin, DeleteView
+):
     model = Cliente
     template_name = "core/confirm_delete.html"
     success_url = reverse_lazy("cliente_list")

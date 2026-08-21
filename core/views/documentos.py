@@ -1,18 +1,22 @@
 from django.urls import reverse_lazy
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 from core.forms import DocumentoForm
 from core.models import Documento, Obra
-from core.views.mixins import UserScopedQuerySetMixin
+from core.views.mixins import (
+    ClienteGroupRequiredMixin,
+    LoginRequiredMixin,
+    UserScopedQuerySetMixin,
+)
 
 
-class DocumentoListView(LoginRequiredMixin, ListView):
+class DocumentoListView(LoginRequiredMixin, ClienteGroupRequiredMixin, ListView):
     model = Documento
     template_name = "core/documento/list.html"
     context_object_name = "documentos"
+    paginate_by = 10
 
     def get_queryset(self):
         obra_pk = self.kwargs.get("obra_pk")
@@ -34,7 +38,9 @@ class DocumentoListView(LoginRequiredMixin, ListView):
         return context
 
 
-class DocumentoDetailView(LoginRequiredMixin, UserScopedQuerySetMixin, DetailView):
+class DocumentoDetailView(
+    LoginRequiredMixin, ClienteGroupRequiredMixin, UserScopedQuerySetMixin, DetailView
+):
     model = Documento
     template_name = "core/documento/detail.html"
     context_object_name = "documento"
@@ -45,7 +51,7 @@ class DocumentoDetailView(LoginRequiredMixin, UserScopedQuerySetMixin, DetailVie
         )
 
 
-class DocumentoCreateView(LoginRequiredMixin, CreateView):
+class DocumentoCreateView(LoginRequiredMixin, ClienteGroupRequiredMixin, CreateView):
     model = Documento
     form_class = DocumentoForm
     template_name = "core/form.html"
@@ -79,7 +85,9 @@ class DocumentoCreateView(LoginRequiredMixin, CreateView):
         return context
 
 
-class DocumentoUpdateView(LoginRequiredMixin, UserScopedQuerySetMixin, UpdateView):
+class DocumentoUpdateView(
+    LoginRequiredMixin, ClienteGroupRequiredMixin, UserScopedQuerySetMixin, UpdateView
+):
     model = Documento
     form_class = DocumentoForm
     template_name = "core/form.html"
@@ -102,7 +110,9 @@ class DocumentoUpdateView(LoginRequiredMixin, UserScopedQuerySetMixin, UpdateVie
         )
 
 
-class DocumentoDeleteView(LoginRequiredMixin, UserScopedQuerySetMixin, DeleteView):
+class DocumentoDeleteView(
+    LoginRequiredMixin, ClienteGroupRequiredMixin, UserScopedQuerySetMixin, DeleteView
+):
     model = Documento
     template_name = "core/confirm_delete.html"
 

@@ -1,18 +1,22 @@
 from django.urls import reverse_lazy
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 from core.forms import ImagemObraForm
 from core.models import ImagemObra, Obra
-from core.views.mixins import UserScopedQuerySetMixin
+from core.views.mixins import (
+    ClienteGroupRequiredMixin,
+    LoginRequiredMixin,
+    UserScopedQuerySetMixin,
+)
 
 
-class ImagemObraListView(LoginRequiredMixin, ListView):
+class ImagemObraListView(LoginRequiredMixin, ClienteGroupRequiredMixin, ListView):
     model = ImagemObra
     template_name = "core/imagem/list.html"
     context_object_name = "imagens"
+    paginate_by = 9
 
     def get_queryset(self):
         obra_pk = self.kwargs.get("obra_pk")
@@ -34,7 +38,9 @@ class ImagemObraListView(LoginRequiredMixin, ListView):
         return context
 
 
-class ImagemObraDetailView(LoginRequiredMixin, UserScopedQuerySetMixin, DetailView):
+class ImagemObraDetailView(
+    LoginRequiredMixin, ClienteGroupRequiredMixin, UserScopedQuerySetMixin, DetailView
+):
     model = ImagemObra
     template_name = "core/imagem/detail.html"
     context_object_name = "imagem"
@@ -45,7 +51,7 @@ class ImagemObraDetailView(LoginRequiredMixin, UserScopedQuerySetMixin, DetailVi
         )
 
 
-class ImagemObraCreateView(LoginRequiredMixin, CreateView):
+class ImagemObraCreateView(LoginRequiredMixin, ClienteGroupRequiredMixin, CreateView):
     model = ImagemObra
     form_class = ImagemObraForm
     template_name = "core/form.html"
@@ -79,7 +85,9 @@ class ImagemObraCreateView(LoginRequiredMixin, CreateView):
         return context
 
 
-class ImagemObraUpdateView(LoginRequiredMixin, UserScopedQuerySetMixin, UpdateView):
+class ImagemObraUpdateView(
+    LoginRequiredMixin, ClienteGroupRequiredMixin, UserScopedQuerySetMixin, UpdateView
+):
     model = ImagemObra
     form_class = ImagemObraForm
     template_name = "core/form.html"
@@ -107,7 +115,9 @@ class ImagemObraUpdateView(LoginRequiredMixin, UserScopedQuerySetMixin, UpdateVi
         )
 
 
-class ImagemObraDeleteView(LoginRequiredMixin, UserScopedQuerySetMixin, DeleteView):
+class ImagemObraDeleteView(
+    LoginRequiredMixin, ClienteGroupRequiredMixin, UserScopedQuerySetMixin, DeleteView
+):
     model = ImagemObra
     template_name = "core/confirm_delete.html"
 

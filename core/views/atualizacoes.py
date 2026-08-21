@@ -1,18 +1,24 @@
 from django.urls import reverse_lazy
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 from core.forms import AtualizacaoObraForm
 from core.models import AtualizacaoObra, Obra
-from core.views.mixins import UserScopedQuerySetMixin
+from core.views.mixins import (
+    ClienteGroupRequiredMixin,
+    LoginRequiredMixin,
+    UserScopedQuerySetMixin,
+)
 
 
-class AtualizacaoObraListView(LoginRequiredMixin, ListView):
+class AtualizacaoObraListView(
+    LoginRequiredMixin, ClienteGroupRequiredMixin, ListView
+):
     model = AtualizacaoObra
     template_name = "core/atualizacao/list.html"
     context_object_name = "atualizacoes"
+    paginate_by = 10
 
     def get_queryset(self):
         obra_pk = self.kwargs.get("obra_pk")
@@ -34,7 +40,9 @@ class AtualizacaoObraListView(LoginRequiredMixin, ListView):
         return context
 
 
-class AtualizacaoObraDetailView(LoginRequiredMixin, UserScopedQuerySetMixin, DetailView):
+class AtualizacaoObraDetailView(
+    LoginRequiredMixin, ClienteGroupRequiredMixin, UserScopedQuerySetMixin, DetailView
+):
     model = AtualizacaoObra
     template_name = "core/atualizacao/detail.html"
     context_object_name = "atualizacao"
@@ -45,7 +53,9 @@ class AtualizacaoObraDetailView(LoginRequiredMixin, UserScopedQuerySetMixin, Det
         )
 
 
-class AtualizacaoObraCreateView(LoginRequiredMixin, CreateView):
+class AtualizacaoObraCreateView(
+    LoginRequiredMixin, ClienteGroupRequiredMixin, CreateView
+):
     model = AtualizacaoObra
     form_class = AtualizacaoObraForm
     template_name = "core/form.html"
@@ -78,7 +88,9 @@ class AtualizacaoObraCreateView(LoginRequiredMixin, CreateView):
         return context
 
 
-class AtualizacaoObraUpdateView(LoginRequiredMixin, UserScopedQuerySetMixin, UpdateView):
+class AtualizacaoObraUpdateView(
+    LoginRequiredMixin, ClienteGroupRequiredMixin, UserScopedQuerySetMixin, UpdateView
+):
     model = AtualizacaoObra
     form_class = AtualizacaoObraForm
     template_name = "core/form.html"
@@ -105,7 +117,9 @@ class AtualizacaoObraUpdateView(LoginRequiredMixin, UserScopedQuerySetMixin, Upd
         )
 
 
-class AtualizacaoObraDeleteView(LoginRequiredMixin, UserScopedQuerySetMixin, DeleteView):
+class AtualizacaoObraDeleteView(
+    LoginRequiredMixin, ClienteGroupRequiredMixin, UserScopedQuerySetMixin, DeleteView
+):
     model = AtualizacaoObra
     template_name = "core/confirm_delete.html"
 

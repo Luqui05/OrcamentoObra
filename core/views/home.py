@@ -1,5 +1,4 @@
 from django.views.generic import TemplateView
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 
 from core.models import (
@@ -10,9 +9,10 @@ from core.models import (
     Obra,
     Orcamento,
 )
+from core.views.mixins import ClienteGroupRequiredMixin, LoginRequiredMixin
 
 
-class HomeTemplateView(LoginRequiredMixin, TemplateView):
+class HomeTemplateView(LoginRequiredMixin, ClienteGroupRequiredMixin, TemplateView):
     template_name = "core/index.html"
 
     def get_context_data(self, **kwargs):

@@ -1,5 +1,4 @@
 from django.urls import reverse_lazy
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import (
     ListView,
     DetailView,
@@ -12,13 +11,20 @@ from django.db.models import Q
 from core.forms import ObraForm
 from core.models import Obra
 from core.utils import montar_galeria_obra
-from core.views.mixins import UserScopedQuerySetMixin
+from core.views.mixins import (
+    ClienteGroupRequiredMixin,
+    LoginRequiredMixin,
+    UserScopedQuerySetMixin,
+)
 
 
-class ObraListView(LoginRequiredMixin, UserScopedQuerySetMixin, ListView):
+class ObraListView(
+    LoginRequiredMixin, ClienteGroupRequiredMixin, UserScopedQuerySetMixin, ListView
+):
     model = Obra
     template_name = "core/obra/list.html"
     context_object_name = "obras"
+    paginate_by = 10
 
     def get_user_filter(self):
         return Q(cliente_principal__usuario=self.request.user) | Q(
@@ -26,7 +32,9 @@ class ObraListView(LoginRequiredMixin, UserScopedQuerySetMixin, ListView):
         )
 
 
-class ObraDetailView(LoginRequiredMixin, UserScopedQuerySetMixin, DetailView):
+class ObraDetailView(
+    LoginRequiredMixin, ClienteGroupRequiredMixin, UserScopedQuerySetMixin, DetailView
+):
     model = Obra
     template_name = "core/obra/detail.html"
     context_object_name = "obra"
@@ -43,7 +51,9 @@ class ObraDetailView(LoginRequiredMixin, UserScopedQuerySetMixin, DetailView):
         )
 
 
-class ObraGaleriaView(LoginRequiredMixin, UserScopedQuerySetMixin, DetailView):
+class ObraGaleriaView(
+    LoginRequiredMixin, ClienteGroupRequiredMixin, UserScopedQuerySetMixin, DetailView
+):
     model = Obra
     template_name = "core/obra/galeria.html"
     context_object_name = "obra"
@@ -69,7 +79,7 @@ class ObraGaleriaView(LoginRequiredMixin, UserScopedQuerySetMixin, DetailView):
         )
 
 
-class ObraCreateView(LoginRequiredMixin, CreateView):
+class ObraCreateView(LoginRequiredMixin, ClienteGroupRequiredMixin, CreateView):
     model = Obra
     form_class = ObraForm
     template_name = "core/form.html"
@@ -87,7 +97,9 @@ class ObraCreateView(LoginRequiredMixin, CreateView):
     }
 
 
-class ObraUpdateView(LoginRequiredMixin, UserScopedQuerySetMixin, UpdateView):
+class ObraUpdateView(
+    LoginRequiredMixin, ClienteGroupRequiredMixin, UserScopedQuerySetMixin, UpdateView
+):
     model = Obra
     form_class = ObraForm
     template_name = "core/form.html"
@@ -110,7 +122,9 @@ class ObraUpdateView(LoginRequiredMixin, UserScopedQuerySetMixin, UpdateView):
         )
 
 
-class ObraDeleteView(LoginRequiredMixin, UserScopedQuerySetMixin, DeleteView):
+class ObraDeleteView(
+    LoginRequiredMixin, ClienteGroupRequiredMixin, UserScopedQuerySetMixin, DeleteView
+):
     model = Obra
     template_name = "core/confirm_delete.html"
     success_url = reverse_lazy("obra_list")
