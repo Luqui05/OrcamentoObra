@@ -1,11 +1,12 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 
 from usuarios.constants import CLIENTE_GROUP_NAME
 
-from .models import Cliente, Obra
+from .models import Cliente, Obra, Orcamento
 
 
 class CoreAccessTests(TestCase):
@@ -36,7 +37,22 @@ class CoreAccessTests(TestCase):
         return obra
 
     def test_usuario_anonimo_e_redirecionado_para_login(self):
-        for url in (reverse("index"), reverse("obra_list")):
+        orcamento = Orcamento.objects.create(
+            obra=self.obra,
+            versao=1,
+            descricao="Orçamento inicial",
+            valor_total="1500.00",
+            arquivo_pdf=SimpleUploadedFile(
+                "orcamento.pdf", b"arquivo de teste", content_type="application/pdf"
+            ),
+        )
+        urls = (
+            reverse("index"),
+            reverse("obra_list"),
+            reverse("orcamento_update", args=[orcamento.pk]),
+        )
+
+        for url in urls:
             with self.subTest(url=url):
                 response = self.client.get(url)
 

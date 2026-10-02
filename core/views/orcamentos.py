@@ -74,12 +74,12 @@ class OrcamentoUpdateView(
     def get_success_url(self):
         return reverse_lazy("obra_detail", kwargs={"pk": self.object.obra.pk})
 
-    def dispatch(self, request, *args, **kwargs):
-        obj = self.get_object()
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
         latest = obj.obra.orcamentos.order_by("-data_emissao").first()
         if not latest or obj.pk != latest.pk:
             raise PermissionDenied("Somente o orçamento mais recente pode ser editado.")
-        return super().dispatch(request, *args, **kwargs)
+        return obj
 
     extra_context = {
         "titulo": "Editar orçamento",
