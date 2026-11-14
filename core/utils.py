@@ -1,33 +1,37 @@
 """Utils e helpers do app core."""
 from typing import List
 
-from core.models import ImagemObra, Documento, Orcamento, Obra
+from django.urls import reverse
+
+from core.models import Obra
 
 
 def montar_galeria_obra(obra: Obra) -> List[dict]:
     """Monta os itens da galeria unificada (imagens, documentos e orcamentos)."""
     galeria = []
 
-    for img in obra.imagens.all():
+    for img in obra.imagens_visiveis:
         if img.imagem:
             galeria.append(
                 {
                     "tipo": "imagem",
                     "titulo": img.legenda or "Imagem",
                     "descricao": "",
-                    "url": img.imagem.url,
+                    "url": reverse("imagem_arquivo", args=[img.pk]),
                     "data": img.data_upload,
                     "obj": img,
                 }
             )
 
-    for doc in obra.documentos.all():
+    for doc in obra.documentos_visiveis:
+        if not doc.arquivo:
+            continue
         galeria.append(
             {
                 "tipo": "documento",
                 "titulo": doc.titulo,
                 "descricao": doc.descricao,
-                "url": doc.arquivo.url,
+                "url": reverse("documento_arquivo", args=[doc.pk]),
                 "data": doc.data_upload,
                 "obj": doc,
             }
@@ -40,7 +44,7 @@ def montar_galeria_obra(obra: Obra) -> List[dict]:
                     "tipo": "orcamento",
                     "titulo": f"Orcamento v{orc.versao}",
                     "descricao": orc.descricao,
-                    "url": orc.arquivo_pdf.url,
+                    "url": reverse("orcamento_arquivo", args=[orc.pk]),
                     "data": orc.data_emissao,
                     "obj": orc,
                 }

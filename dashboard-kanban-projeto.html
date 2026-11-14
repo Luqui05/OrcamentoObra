@@ -1,0 +1,2632 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>OrcamentoObra · Acompanhamento do Desenvolvimento</title>
+    <style>
+      /* 1. Design: variáveis compartilhadas pelos temas e componentes. */
+      :root {
+        --bg: #f5f6f8;
+        --surface: #fff;
+        --soft: #eef1f5;
+        --ink: #202735;
+        --muted: #596579;
+        --line: #dce1e9;
+        --accent: #465bc5;
+        --backlog: #3b82f6;
+        --andamento: #f59e0b;
+        --concluido: #22c55e;
+        --verificar: #8792a5;
+        --bloqueado: #ef4444;
+        --shadow: 0 3px 12px #17243a08;
+      }
+      [data-theme="dark"] {
+        --bg: #141821;
+        --surface: #1d2330;
+        --soft: #252d3b;
+        --ink: #e9edf5;
+        --muted: #adb9ca;
+        --line: #374153;
+        --accent: #a6b5ff;
+        --shadow: none;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font:
+          14px/1.55 system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+      }
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
+        color: inherit;
+      }
+      button,
+      select,
+      input,
+      textarea {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      button {
+        cursor: pointer;
+        min-height: 42px;
+        padding: 8px 14px;
+        font-weight: 600;
+      }
+      button:hover {
+        background: var(--soft);
+      }
+      button:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+      button.primary {
+        background: #465bc5;
+        color: white;
+        border-color: #465bc5;
+      }
+      button.danger {
+        color: #c43838;
+      }
+      input,
+      select,
+      textarea {
+        width: 100%;
+        padding: 10px;
+      }
+      textarea {
+        resize: vertical;
+        min-height: 85px;
+      }
+      input[type="checkbox"] {
+        width: 19px;
+        height: 19px;
+        accent-color: #465bc5;
+      }
+      input[type="file"] {
+        max-width: 300px;
+      }
+      :focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: 3px;
+      }
+      h1,
+      h2,
+      h3,
+      p {
+        margin-top: 0;
+      }
+      h1 {
+        font-size: 29px;
+        letter-spacing: -1px;
+        margin-bottom: 4px;
+      }
+      h2 {
+        font-size: 20px;
+      }
+      h3 {
+        font-size: 16px;
+      }
+      small,
+      .muted {
+        color: var(--muted);
+      }
+      .shell {
+        max-width: 1800px;
+        margin: auto;
+        padding: 0 32px 32px;
+      }
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 0;
+        border-bottom: 1px solid var(--line);
+        gap: 16px;
+      }
+      .brand {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        font-weight: 750;
+      }
+      .logo {
+        background: #465bc5;
+        color: white;
+        border-radius: 10px;
+        padding: 7px 12px;
+        font-size: 20px;
+      }
+      .actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .eyebrow {
+        font-size: 11px;
+        letter-spacing: 1.4px;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 700;
+      }
+      .hero {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 24px;
+        margin: 30px 0 22px;
+      }
+      .hero p {
+        margin: 0;
+        color: var(--muted);
+      }
+      .tag {
+        display: inline-block;
+        background: var(--soft);
+        padding: 3px 8px;
+        border-radius: 5px;
+        font-size: 11px;
+        font-weight: 600;
+        max-width: 100%;
+        overflow-wrap: anywhere;
+      }
+      .notice {
+        border: 1px solid var(--line);
+        border-left: 3px solid var(--accent);
+        border-radius: 8px;
+        padding: 12px 16px;
+        background: var(--surface);
+        margin: 16px 0;
+        color: var(--muted);
+      }
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 12px;
+      }
+      .metric,
+      .panel {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 18px;
+        box-shadow: var(--shadow);
+      }
+      .metric strong {
+        font-size: 29px;
+        display: block;
+        margin: 5px 0;
+      }
+      .metric small {
+        font-size: 12px;
+      }
+      .progressline {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        margin: 18px 0;
+      }
+      .progressline progress {
+        flex: 1;
+      }
+      .progressline small {
+        max-width: 520px;
+      }
+      progress {
+        width: 100%;
+        height: 7px;
+        appearance: none;
+        border: 0;
+        background: var(--soft);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      progress::-webkit-progress-bar {
+        background: var(--soft);
+      }
+      progress::-webkit-progress-value {
+        background: #6678db;
+      }
+      progress::-moz-progress-bar {
+        background: #6678db;
+      }
+      .tabs {
+        display: flex;
+        gap: 5px;
+        border-bottom: 1px solid var(--line);
+        margin-top: 24px;
+        overflow: auto;
+      }
+      .tabs button {
+        white-space: nowrap;
+        background: none;
+        border: 0;
+        border-radius: 0;
+        padding: 14px 18px;
+        border-bottom: 3px solid transparent;
+        color: var(--muted);
+      }
+      .tabs button[aria-selected="true"] {
+        color: var(--accent);
+        border-bottom-color: var(--accent);
+      }
+      .toolbar {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        padding: 20px 0 12px;
+      }
+      .toolbar input {
+        max-width: 430px;
+      }
+      .toolbar select {
+        width: auto;
+        margin-left: auto;
+      }
+      .filters {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 10px;
+        margin: 8px 0 18px;
+      }
+      .filters label {
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .filters select {
+        margin-top: 4px;
+        font-size: 12px;
+      }
+      .board {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(285px, 1fr));
+        gap: 16px;
+        overflow-x: auto;
+        padding-bottom: 20px;
+        align-items: start;
+      }
+      .column {
+        background: var(--soft);
+        border-radius: 11px;
+        min-height: 300px;
+        border-top: 3px solid var(--status);
+      }
+      .column-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px;
+        font-weight: 700;
+      }
+      .dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--status);
+        margin-right: 8px;
+      }
+      .count {
+        background: var(--surface);
+        padding: 1px 8px;
+        border-radius: 6px;
+        font-size: 12px;
+      }
+      .cards {
+        padding: 0 10px 12px;
+        min-height: 220px;
+        max-height: 65vh;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        scrollbar-width: thin;
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        padding: 15px;
+        margin-bottom: 10px;
+        box-shadow: var(--shadow);
+        cursor: grab;
+        transition: transform 0.15s;
+      }
+      .card:hover {
+        border-color: var(--accent);
+        transform: translateY(-2px);
+      }
+      .card h3 {
+        font-size: 14px;
+        line-height: 1.45;
+        margin: 10px 0 7px;
+      }
+      .card p {
+        font-size: 12px;
+        color: var(--muted);
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        margin-bottom: 12px;
+      }
+      .card-top,
+      .card-foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .card-tags {
+        display: flex;
+        gap: 5px;
+        margin: 9px 0;
+      }
+      .priority-alta {
+        color: #ad5014;
+      }
+      [data-theme="dark"] .priority-alta {
+        color: #ffbd87;
+      }
+      .card small {
+        font-size: 10px;
+      }
+      .card .open {
+        border: 0;
+        background: none;
+        padding: 0;
+        text-align: left;
+        min-height: 0;
+        width: 100%;
+        font-weight: 700;
+      }
+      .card .open:hover {
+        color: var(--accent);
+      }
+      .dragging {
+        opacity: 0.4;
+      }
+      .drop-over {
+        outline: 2px dashed var(--accent);
+        outline-offset: -4px;
+      }
+      .drop-before {
+        border-top: 4px solid var(--accent);
+      }
+      .empty {
+        padding: 25px 12px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .results {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 14px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .table-wrap {
+        overflow: auto;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: 12px;
+      }
+      th,
+      td {
+        padding: 13px;
+        text-align: left;
+        border-bottom: 1px solid var(--line);
+        vertical-align: top;
+        min-width: 110px;
+      }
+      th {
+        color: var(--muted);
+        background: var(--soft);
+      }
+      td:first-child {
+        min-width: 230px;
+      }
+      td p {
+        margin: 4px 0;
+      }
+      td button {
+        font-size: 12px;
+        padding: 0;
+        border: 0;
+        background: none;
+        text-align: left;
+      }
+      .report-summary {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin: 20px 0;
+      }
+      .report-summary strong {
+        font-size: 25px;
+      }
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+        margin: 20px 0;
+      }
+      .steps .panel {
+        border-left: 3px solid var(--andamento);
+      }
+      .section-heading {
+        margin: 22px 0 10px;
+      }
+      .timeline {
+        display: flex;
+        gap: 10px;
+        overflow: auto;
+        margin-top: 14px;
+      }
+      .timeline > div {
+        min-width: 170px;
+        border-left: 2px solid var(--line);
+        padding: 8px 15px;
+      }
+      .timeline b {
+        display: block;
+      }
+      .help {
+        max-width: 900px;
+        margin: 24px auto;
+      }
+      .help li {
+        margin-bottom: 10px;
+      }
+      .error {
+        background: #9e2532;
+        color: white;
+        padding: 12px;
+        border-radius: 8px;
+      }
+      .footer {
+        margin-top: 24px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      dialog {
+        color: var(--ink);
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 0;
+        width: min(850px, calc(100% - 24px));
+        max-height: 92dvh;
+        box-shadow: 0 20px 90px #0005;
+      }
+      dialog::backdrop {
+        background: #10172799;
+        backdrop-filter: blur(3px);
+      }
+      .modal-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        padding: 20px 24px;
+        border-bottom: 1px solid var(--line);
+        position: sticky;
+        top: 0;
+        background: var(--surface);
+        z-index: 1;
+      }
+      .modal-head h2 {
+        margin: 0;
+        font-size: 19px;
+      }
+      .modal-body {
+        padding: 22px 24px;
+      }
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+      }
+      .form-grid label {
+        display: block;
+        font-size: 12px;
+        font-weight: 650;
+      }
+      .form-grid input,
+      .form-grid textarea,
+      .form-grid select {
+        margin-top: 5px;
+        font-weight: 400;
+      }
+      .full {
+        grid-column: 1/-1;
+      }
+      .modal-foot {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+        padding: 16px 24px;
+        position: sticky;
+        bottom: 0;
+        background: var(--surface);
+        border-top: 1px solid var(--line);
+      }
+      .check-row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin: 9px 0;
+      }
+      .check-row input[type="text"] {
+        flex: 1;
+        min-width: 0;
+      }
+      .check-row button {
+        padding: 6px 10px;
+      }
+      .audit {
+        padding: 16px;
+        background: var(--soft);
+        border-radius: 8px;
+        font-size: 12px;
+        margin: 16px 0;
+        overflow-wrap: anywhere;
+      }
+      .audit p {
+        margin-bottom: 8px;
+      }
+      .audit ul {
+        padding-left: 20px;
+      }
+      .subhead {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 18px 0 8px;
+      }
+      .subhead h3 {
+        margin: 0;
+      }
+      .toast {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        max-width: 90%;
+        background: var(--ink);
+        color: var(--surface);
+        padding: 12px 20px;
+        border-radius: 10px;
+        z-index: 10;
+        box-shadow: var(--shadow);
+      }
+      [hidden] {
+        display: none !important;
+      }
+      .print-only {
+        display: none;
+      }
+      @media (min-width: 1600px) {
+        .board {
+          grid-template-columns: repeat(5, minmax(0, 1fr));
+        }
+      }
+      @media (max-width: 1000px) {
+        .metrics {
+          grid-template-columns: repeat(3, 1fr);
+        }
+        .filters {
+          grid-template-columns: repeat(4, 1fr);
+        }
+        .shell {
+          padding: 0 20px 24px;
+        }
+        .hero {
+          align-items: flex-start;
+        }
+        .progressline {
+          flex-wrap: wrap;
+        }
+        .progressline progress {
+          min-width: 150px;
+        }
+      }
+      @media (max-width: 600px) {
+        .shell {
+          padding: 0 14px 20px;
+        }
+        .topbar {
+          flex-wrap: wrap;
+        }
+        .hero {
+          flex-direction: column;
+          margin: 22px 0;
+        }
+        .hero h1 {
+          font-size: 25px;
+        }
+        .metrics {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 8px;
+        }
+        .metric {
+          padding: 12px;
+        }
+        .filters {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .toolbar {
+          flex-wrap: wrap;
+        }
+        .toolbar input {
+          max-width: none;
+          flex-basis: 100%;
+        }
+        .toolbar select {
+          max-width: 180px;
+        }
+        .progressline small {
+          width: 100%;
+        }
+        .form-grid,
+        .report-summary,
+        .steps {
+          grid-template-columns: 1fr;
+        }
+        .modal-body,
+        .modal-head,
+        .modal-foot {
+          padding: 16px;
+        }
+        .board {
+          grid-template-columns: repeat(5, 285px);
+        }
+        .results {
+          flex-wrap: wrap;
+        }
+        .card {
+          padding: 14px;
+        }
+        .tabs button {
+          padding: 12px;
+          font-size: 12px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition: none !important;
+          scroll-behavior: auto !important;
+        }
+      }
+      @media print {
+        body {
+          background: white;
+          color: black;
+          font-size: 10pt;
+        }
+        .shell {
+          max-width: none;
+          padding: 0;
+        }
+        .topbar,
+        .hero .actions,
+        .tabs,
+        .toolbar,
+        .filters,
+        .board,
+        .footer,
+        .toast,
+        dialog,
+        .no-print,
+        #metrics,
+        .progressline,
+        #boardView,
+        #stepsView,
+        #archiveView,
+        #helpView,
+        #storageError {
+          display: none !important;
+        }
+        #reportView {
+          display: block !important;
+        }
+        .print-only {
+          display: block;
+        }
+        .panel,
+        .notice {
+          box-shadow: none;
+          break-inside: avoid;
+        }
+        td,
+        th {
+          min-width: 0 !important;
+          font-size: 8pt;
+          padding: 6px;
+          color: black;
+        }
+        table {
+          table-layout: fixed;
+        }
+        .table-wrap {
+          overflow: visible;
+        }
+        .report-summary {
+          grid-template-columns: repeat(3, 1fr);
+        }
+        .hero {
+          margin: 10px 0;
+        }
+        .tag {
+          color: black;
+          background: #eee;
+        }
+        button {
+          color: black;
+        }
+        thead {
+          display: table-header-group;
+        }
+        tr {
+          break-inside: avoid;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="logo" aria-hidden="true">▥</span>
+          <div>
+            OrcamentoObra<br /><small>Acompanhamento do Desenvolvimento</small>
+          </div>
+        </div>
+        <div class="actions">
+          <span class="tag">IFPR · Engenharia de Software</span
+          ><button id="theme" aria-label="Alternar tema">◐ Tema escuro</button
+          ><button id="settings">Configurações</button>
+        </div>
+      </header>
+      <main>
+        <div class="hero">
+          <div>
+            <div class="eyebrow">
+              Novas Aplicações em Engenharia de Software · 4º ano
+            </div>
+            <h1>Do requisito à entrega.</h1>
+            <p>
+              Seu projeto, as evidências e os próximos passos em um só lugar.
+            </p>
+          </div>
+          <div class="actions">
+            <button id="export">↓ Exportar JSON</button
+            ><button class="primary" id="newTask">＋ Nova tarefa</button>
+          </div>
+        </div>
+        <div id="storageError" class="error" role="alert" hidden></div>
+        <div class="metrics" id="metrics"></div>
+        <div class="progressline">
+          <b id="progressLabel"></b
+          ><progress
+            id="progress"
+            max="100"
+            aria-label="Progresso geral"
+          ></progress
+          ><small
+            >Pesos iguais: concluídas ÷ todas as tarefas. Inclui não verificadas
+            e arquivadas. Status manual não comprova conformidade.</small
+          >
+        </div>
+        <div class="notice no-print">
+          Auditoria de código em <b>16/10/2026</b> · revisão <b>ea34454</b>.
+          Evidências estáticas; execução integral do Django e conexão Neon não
+          validadas. O quadro é editável e a auditoria inicial permanece
+          registrada.
+        </div>
+        <nav class="tabs" role="tablist" aria-label="Visualizações">
+          <button
+            role="tab"
+            aria-selected="true"
+            aria-controls="boardView"
+            data-tab="board"
+          >
+            Quadro Kanban</button
+          ><button
+            role="tab"
+            aria-selected="false"
+            aria-controls="reportView"
+            data-tab="report"
+          >
+            Relatório de Conformidade</button
+          ><button
+            role="tab"
+            aria-selected="false"
+            aria-controls="stepsView"
+            data-tab="steps"
+          >
+            Próximos Passos</button
+          ><button
+            role="tab"
+            aria-selected="false"
+            aria-controls="archiveView"
+            data-tab="archive"
+          >
+            Arquivadas</button
+          ><button
+            role="tab"
+            aria-selected="false"
+            aria-controls="helpView"
+            data-tab="help"
+          >
+            Como funciona
+          </button>
+        </nav>
+        <section id="boardView" role="tabpanel">
+          <div class="toolbar">
+            <input
+              id="search"
+              type="search"
+              aria-label="Pesquisar tarefas"
+              placeholder="Pesquisar por título, descrição ou ID…"
+            /><button
+              id="toggleFilters"
+              aria-expanded="false"
+              aria-controls="filters"
+            >
+              Filtros</button
+            ><select id="sort" aria-label="Ordenar tarefas">
+              <option value="manual">Ordem personalizada</option>
+              <option value="priority">Prioridade</option>
+              <option value="dueDate">Prazo</option>
+              <option value="title">Título</option></select
+            ><button id="clearFilters">Limpar</button>
+          </div>
+          <div id="filters" class="filters" hidden></div>
+          <div class="results">
+            <span id="resultCount" aria-live="polite"></span
+            ><span
+              >Arraste para mover · Abra um card para editar ou mover pelo
+              teclado/toque</span
+            >
+          </div>
+          <div class="board" id="board"></div>
+        </section>
+        <section id="reportView" role="tabpanel" hidden></section>
+        <section id="stepsView" role="tabpanel" hidden></section>
+        <section id="archiveView" role="tabpanel" hidden></section>
+        <section id="helpView" class="help panel" role="tabpanel" hidden>
+          <h2>Um arquivo, três camadas</h2>
+          <p>
+            Este dashboard funciona offline. Abra este HTML no navegador; ele
+            não precisa do servidor Django.
+          </p>
+          <ol>
+            <li>
+              <b>HTML:</b> define o cabeçalho, as abas, o quadro e o formulário
+              em um elemento <code>dialog</code>. Os cards são criados pelo
+              JavaScript a partir dos dados.
+            </li>
+            <li>
+              <b>CSS:</b> organiza o layout com Grid e Flexbox. Variáveis de cor
+              permitem trocar o tema; media queries adaptam telas pequenas e a
+              impressão.
+            </li>
+            <li>
+              <b>JavaScript:</b> mantém um objeto de estado com tarefas,
+              preferências e ordem. As funções de renderização leem esse estado;
+              cada alteração salva os dados e atualiza as visualizações.
+            </li>
+          </ol>
+          <h3>Dados e evidências</h3>
+          <p>
+            <code>SEED</code> contém o inventário inicial, critérios de aceite,
+            referências ao PDF e evidências do repositório.
+            <code>state.tasks</code> contém sua versão editável. Uma cópia da
+            auditoria inicial é preservada no próprio arquivo; mover um card ou
+            marcar um checklist nunca altera essa evidência.
+          </p>
+          <p>
+            Os requisitos repetidos foram consolidados. Uma capacidade pode
+            aparecer em vários trimestres no relatório, mas conta uma única vez
+            no progresso geral. As tarefas arquivadas continuam no denominador e
+            no relatório. Tarefas pessoais aparecem no quadro e nos indicadores,
+            mas ficam fora da matriz acadêmica.
+          </p>
+          <h3>Salvar, compartilhar e restaurar</h3>
+          <p>
+            <code>localStorage</code> salva neste navegador e neste endereço do
+            arquivo. Mover ou renomear o HTML pode mudar o armazenamento
+            utilizado. Não existe sincronização entre computadores. Exporte um
+            JSON como cópia de segurança e importe em Configurações. A
+            importação substitui o quadro após validação e confirmação.
+          </p>
+          <h3>Movimentação acessível</h3>
+          <p>
+            No computador, arraste os cards; solte sobre outro card para inserir
+            antes dele, ou no espaço da coluna para inserir no final. No celular
+            ou pelo teclado, abra um card, escolha o status e a posição e salve.
+            A ordem personalizada é preservada; ordenações por título, prazo ou
+            prioridade são apenas visualizações.
+          </p>
+          <h3>Método da auditoria</h3>
+          <p>
+            Foram lidas as cinco páginas do plano, modelos, views, formulários,
+            URLs, templates, configurações, migrações, testes e histórico Git.
+            “Concluído” na auditoria significa implementação compatível
+            identificada no código, não homologação pelo professor. O ambiente
+            virtual aponta para um Python indisponível; os testes Django não
+            foram executados. O relatório antigo
+            <code>check-sistema.md</code> está defasado e não foi usado como
+            prova de ausência de funcionalidades.
+          </p>
+          <p>
+            A página 5 do PDF traz comandos Git de referência, não tarefas para
+            executar automaticamente. Recuperações são marcos alternativos, não
+            tarefas duplicadas. O plano não especifica data própria para a
+            primeira etapa do terceiro trimestre; foi usado o prazo final do
+            trimestre.
+          </p>
+        </section>
+      </main>
+      <footer class="footer">
+        Dados locais · Sem envio para servidores · Faça backups em JSON antes de
+        limpar os dados do navegador.
+      </footer>
+    </div>
+    <dialog id="taskDialog" aria-labelledby="dialogTitle">
+      <form id="taskForm">
+        <div class="modal-head">
+          <div>
+            <small id="taskId"></small>
+            <h2 id="dialogTitle">Nova tarefa</h2>
+          </div>
+          <button type="button" id="closeTask" aria-label="Fechar detalhes">
+            ✕
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-grid" id="taskFields"></div>
+          <div class="subhead">
+            <h3>Checklist</h3>
+            <span id="checkCount"></span>
+          </div>
+          <progress
+            id="checkProgress"
+            max="100"
+            aria-label="Progresso do checklist"
+          ></progress>
+          <div id="checklist"></div>
+          <button type="button" id="addCheck">＋ Adicionar subtarefa</button>
+          <div id="auditDetails"></div>
+          <p id="formError" class="error" role="alert" hidden></p>
+        </div>
+        <div class="modal-foot">
+          <div class="actions">
+            <button type="button" id="archiveTask">Arquivar</button
+            ><button type="button" id="deleteTask" class="danger">
+              Excluir
+            </button>
+          </div>
+          <div class="actions">
+            <button type="button" id="cancelTask">Cancelar</button
+            ><button type="submit" class="primary">Salvar alterações</button>
+          </div>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="settingsDialog" aria-labelledby="settingsTitle">
+      <div class="modal-head">
+        <h2 id="settingsTitle">Configurações e backups</h2>
+        <button id="closeSettings" aria-label="Fechar configurações">✕</button>
+      </div>
+      <div class="modal-body">
+        <h3>Importar backup JSON</h3>
+        <p>
+          Substitui suas tarefas e preferências. Arquivos inválidos são
+          rejeitados antes de qualquer alteração. Os requisitos acadêmicos
+          originais devem estar presentes.
+        </p>
+        <input
+          type="file"
+          id="importFile"
+          accept=".json,application/json"
+          aria-label="Importar arquivo JSON"
+        />
+        <h3 class="section-heading">Exportar relatório</h3>
+        <div class="actions">
+          <button id="exportReport">Baixar resumo (.txt)</button
+          ><button id="printReport">Imprimir / salvar PDF</button>
+        </div>
+        <h3 class="section-heading">Persistência</h3>
+        <p>
+          As alterações ficam neste navegador. A aplicação informa quando não
+          consegue salvar. Exportar JSON continua disponível nesse caso.
+        </p>
+        <button id="reset" class="danger">Restaurar inventário inicial</button>
+        <p>
+          <small
+            >Restaura tarefas e preferências; exporte um backup para preservar
+            seu trabalho.</small
+          >
+        </p>
+      </div>
+    </dialog>
+    <div id="toast" class="toast" role="status" hidden></div>
+    <script>
+      "use strict";
+      /* 2. Inventário auditado. Cada capacidade é única, mesmo quando o plano a repete. */
+      const STATUS = {
+        backlog: "Backlog",
+        andamento: "Em andamento",
+        concluido: "Concluído",
+        verificar: "A verificar",
+        bloqueado: "Bloqueado",
+      };
+      const PRIORITY = { alta: "Alta", media: "Média", baixa: "Baixa" };
+      const CATEGORIES = [
+        "Infraestrutura e configuração",
+        "Modelagem de dados",
+        "CRUD e views genéricas",
+        "Templates e interface",
+        "Formulários",
+        "Autenticação e autorização",
+        "Regras de negócio",
+        "Consultas e filtros",
+        "Paginação",
+        "Performance e otimização",
+        "Bibliotecas front-end",
+        "Integração e validação",
+        "Documentação e versionamento",
+      ];
+      const MILESTONES = [
+        ["2026-05-08", "1º trimestre · apresentação"],
+        ["2026-05-15", "1º trimestre · recuperação"],
+        ["2026-07-10", "2º trimestre · entrega 1"],
+        ["2026-08-21", "2º trimestre · entrega 2"],
+        ["2026-08-28", "2º trimestre · recuperação"],
+        ["2026-12-04", "Apresentação final"],
+        ["2026-12-11", "Recuperação final"],
+      ];
+      function task(
+        id,
+        title,
+        category,
+        refs,
+        status,
+        priority,
+        description,
+        checks,
+        evidence,
+        pending,
+        dependencies = [],
+      ) {
+        const earliest = refs
+          .filter((r) => r[0] > 0)
+          .sort((a, b) => a[0] - b[0] || a[1] - b[1])[0];
+        return {
+          id,
+          title,
+          category: CATEGORIES[category],
+          refs,
+          status,
+          priority,
+          description,
+          dueDate: earliest
+            ? earliest[0] === 1
+              ? "2026-05-08"
+              : earliest[0] === 2
+                ? earliest[1] === 1
+                  ? "2026-07-10"
+                  : "2026-08-21"
+                : "2026-12-04"
+            : "2026-12-04",
+          checklist: checks.map((s) => ({
+            text: s.slice(1),
+            done: s[0] === "+",
+          })),
+          evidence,
+          pending,
+          dependencies,
+          notes: "",
+          blocker: "",
+          archived: false,
+          original: true,
+          verification:
+            status === "concluido"
+              ? "Evidência estática suficiente"
+              : status === "verificar"
+                ? "Não verificado"
+                : "Evidência estática parcial ou lacuna confirmada",
+        };
+      }
+      const SEED = [
+        task(
+          "G01",
+          "Estrutura Python e Django",
+          0,
+          [
+            [0, 0, 1],
+            [1, 1, 2],
+          ],
+          "concluido",
+          "alta",
+          "Projeto web organizado nos apps core e usuarios.",
+          [
+            "+Projeto, settings e entrypoints Django",
+            "+Apps e rotas integrados",
+          ],
+          "manage.py; OrcamentoObra/settings.py, urls.py; core/apps.py; usuarios/apps.py. Django 5.2.11 declarado em requirements.txt.",
+          "Implementação identificada; inicialização completa não executada.",
+        ),
+        task(
+          "G02",
+          "Seis modelos de domínio",
+          1,
+          [
+            [0, 0, 1],
+            [1, 1, 2],
+          ],
+          "concluido",
+          "alta",
+          "Seis classes sem contar User, com atributos e relacionamentos.",
+          [
+            "+Cliente",
+            "+Obra",
+            "+Orcamento",
+            "+Documento",
+            "+AtualizacaoObra",
+            "+ImagemObra",
+          ],
+          "core/models.py: seis subclasses de models.Model; core/migrations/0001_initial.py e 0002; core/admin.py registra as seis classes.",
+          "Compatibilidade fina com o diagrama é acompanhada em T1-DIAGRAMA.",
+          ["G01"],
+        ),
+        task(
+          "T1-SOBRE",
+          "Página Sobre e descrição do sistema",
+          3,
+          [[1, 1, 2]],
+          "concluido",
+          "media",
+          "Rota pública com apresentação textual do OrcamentoObra.",
+          [
+            "+URL /sobre/",
+            "+SobreTemplateView",
+            "+Template com descrição textual",
+          ],
+          "core/urls.py: sobre/; core/views/home.py: SobreTemplateView; core/templates/core/sobre.html descreve o domínio.",
+          "Validar visualmente em execução durante a revisão geral.",
+          ["G01"],
+        ),
+        task(
+          "T1-CASOS",
+          "Diagrama de casos de uso como imagem",
+          12,
+          [[1, 1, 2]],
+          "concluido",
+          "media",
+          "Imagem referenciada pela página Sobre.",
+          [
+            "+Arquivo de imagem presente",
+            "+Imagem e texto alternativo no template",
+          ],
+          "static/images/caso-de-uso.png; core/templates/core/sobre.html: tag img com static e modal de expansão.",
+          "Revisar com o professor se os atores refletem as regras atuais.",
+          ["T1-SOBRE"],
+        ),
+        task(
+          "T1-DIAGRAMA",
+          "Diagrama de classes coerente com os modelos",
+          1,
+          [[1, 1, 2]],
+          "andamento",
+          "media",
+          "A imagem existe e representa as entidades, mas há diferenças de tipos.",
+          [
+            "+Imagem estática e inclusão na página Sobre",
+            "+Seis entidades de domínio representadas",
+            "-Reconciliar tipos do diagrama com os modelos",
+          ],
+          "static/images/classe.png inspecionado: semana_referencia é string no diagrama; core/models.py usa PositiveIntegerField. Campos de data aparecem como date e usam DateTimeField.",
+          "Atualizar os tipos na documentação e revisar cardinalidades.",
+          ["G02", "T1-SOBRE"],
+        ),
+        task(
+          "G05",
+          "Layout com framework front-end",
+          3,
+          [
+            [0, 0, 1],
+            [1, 1, 2],
+          ],
+          "concluido",
+          "media",
+          "Bootstrap aplicado ao template base e às páginas do domínio.",
+          [
+            "+Bootstrap incluído no base.html",
+            "+Layout e componentes usados nos templates",
+            "+CSS próprio para personalização",
+          ],
+          "core/templates/core/base.html: Bootstrap 5.2.3; static/css/app.css; templates usam grid, formulários, cards e navegação Bootstrap.",
+          "Dependência de CDN no Django; disponibilidade em execução não aferida.",
+          ["G01"],
+        ),
+        task(
+          "T1-CONTEXTO",
+          "Templates reutilizáveis e contexto",
+          3,
+          [[1, 1, 2]],
+          "concluido",
+          "media",
+          "Templates base, formulário e exclusão são reutilizados com contexto.",
+          [
+            "+Herança de base.html",
+            "+extra_context nas views",
+            "+get_context_data para conteúdo específico",
+          ],
+          "core/views/clientes.py e obras.py: extra_context; documentos.py e home.py: get_context_data; core/templates/core/form.html e confirm_delete.html.",
+          "Sem lacuna estática identificada.",
+          ["G05"],
+        ),
+        task(
+          "G03",
+          "CRUD e listagens dos modelos pertinentes",
+          2,
+          [
+            [0, 0, 1],
+            [1, 2, 2],
+            [2, 1, 3],
+          ],
+          "concluido",
+          "alta",
+          "Operações genéricas conectadas a URLs, formulários e templates.",
+          [
+            "+CreateView para os seis modelos",
+            "+UpdateView para os seis modelos",
+            "+DeleteView para os seis modelos",
+            "+DetailView para os seis modelos",
+            "+ListView de Cliente, Obra, Documento, AtualizacaoObra e ImagemObra",
+            "+Orçamentos listados no detalhe da obra conforme escopo do domínio",
+            "+Templates para todas as ListView existentes",
+          ],
+          "core/views/{clientes,obras,documentos,atualizacoes,imagens,orcamentos}.py; core/urls.py; core/forms.py; templates correspondentes. ObraDetailView fornece orcamentos ao template obra/detail.html.",
+          "Não existe OrcamentoListView independente; listagem contextual atende a exceção de negócio do plano. Testes ponta a ponta ficam em T3-INTEGRACAO.",
+          ["G02", "T1-CONTEXTO"],
+        ),
+        task(
+          "T1-CRISPY",
+          "Crispy Forms com Bootstrap",
+          4,
+          [[1, 2, 2]],
+          "concluido",
+          "media",
+          "Dependências, apps, template pack e filtro crispy conectados.",
+          [
+            "+Dependências declaradas",
+            "+crispy_forms e crispy_bootstrap5 ativados",
+            "+Template pack bootstrap5 configurado",
+            "+form|crispy utilizado",
+          ],
+          "requirements.txt; OrcamentoObra/settings.py: CRISPY_TEMPLATE_PACK e apps; core/templates/core/form.html: load crispy_forms_tags e form|crispy.",
+          "Instalação efetiva do ambiente não executada; configuração e utilização comprovadas no código.",
+          ["G03"],
+        ),
+        task(
+          "T1-NEON",
+          "PostgreSQL Neon sem dependência de SQLite",
+          0,
+          [[1, 2, 2]],
+          "andamento",
+          "alta",
+          "Há configuração PostgreSQL; uso efetivo da Neon ainda não comprovado.",
+          [
+            "+DATABASE_URL PostgreSQL com sslmode",
+            "+Produção exige DATABASE_URL",
+            "-Comprovar conexão e migrações na Neon",
+            "-Demonstrar aplicação entregue sem SQLite",
+          ],
+          "OrcamentoObra/settings.py interpreta DATABASE_URL, mas usa SQLite quando DEBUG=True e a variável está ausente. db.sqlite3 existe. Nenhuma credencial foi exposta ou usada.",
+          "Configurar ambiente Neon e testar migrações e fluxos na base entregue. Existência de db.sqlite3 não prova qual banco está ativo.",
+          ["G01", "G02"],
+        ),
+        task(
+          "G06",
+          "Autenticação e proteção das views",
+          5,
+          [
+            [0, 0, 1],
+            [2, 1, 3],
+          ],
+          "concluido",
+          "alta",
+          "Login, logout e alteração de senha com proteção no back-end.",
+          [
+            "+URL e template de login",
+            "+Logout via POST",
+            "+Alteração de senha e confirmação",
+            "+LoginRequiredMixin nas views de domínio",
+          ],
+          "usuarios/urls.py: LoginView, LogoutView, PasswordChangeView; core/views/*.py: LoginRequiredMixin; base.html: logout com CSRF. core/tests.py contém testes de acesso anônimo, não executados nesta auditoria.",
+          "Validar sessão e fluxos em execução na revisão geral.",
+          ["G01"],
+        ),
+        task(
+          "T2-MENU",
+          "Conteúdo condicionado à autenticação",
+          3,
+          [[2, 1, 3]],
+          "concluido",
+          "media",
+          "Menu adapta as ações ao usuário autenticado.",
+          [
+            "+Condição request.user.is_authenticated",
+            "+Entrar/cadastrar para visitante e sair/alterar senha para autenticado",
+          ],
+          "core/templates/core/base.html: if request.user.is_authenticated e ações distintas.",
+          "Sem lacuna estática identificada.",
+          ["G06"],
+        ),
+        task(
+          "T2-PROPRIEDADE",
+          "Vínculo e isolamento dos registros por usuário",
+          5,
+          [[2, 1, 3]],
+          "concluido",
+          "alta",
+          "Autorização no queryset e nos formulários, além da interface.",
+          [
+            "+ClienteCreateView.form_valid associa request.user",
+            "+Criações filhas validam obra pertencente ao usuário",
+            "+Edição limitada por UserScopedQuerySetMixin",
+            "+Exclusão limitada por UserScopedQuerySetMixin",
+            "+Listagens filtradas por usuário",
+            "+Detalhes filtrados por usuário",
+          ],
+          "core/views/mixins.py: UserScopedQuerySetMixin; clientes.py: user_filter=usuario e form_valid; obras.py: Q(cliente_principal__usuario) | Q(clientes__usuario); views filhas seguem o vínculo da obra; ObraForm restringe opções ao usuário.",
+          "Testar acessos cruzados com dois usuários; ausência desse teste não é uma vulnerabilidade comprovada.",
+          ["G06", "G03"],
+        ),
+        task(
+          "G07",
+          "Controle por grupos em múltiplas views",
+          5,
+          [
+            [0, 0, 1],
+            [2, 2, 3],
+          ],
+          "concluido",
+          "alta",
+          "Grupo Clientes exigido pelas views do domínio.",
+          [
+            "+Grupo criado em migração",
+            "+Cadastro associa usuário ao grupo",
+            "+GroupRequiredMixin em mais de uma view",
+            "+Negação de acesso no back-end",
+          ],
+          "core/views/mixins.py: ClienteGroupRequiredMixin; usado em home.py e CRUDs; usuarios/views.py e migrations/0001_criar_grupo_clientes.py. core/tests.py cobre 403 fora do grupo, sem execução nesta auditoria.",
+          "Executar testes para perfis autorizados e não autorizados.",
+          ["G06"],
+        ),
+        task(
+          "T2-QUERIES",
+          "Consultas em outras views",
+          7,
+          [[2, 2, 3]],
+          "concluido",
+          "media",
+          "Dashboard Django usa contagens e obras recentes obtidas por QuerySets.",
+          [
+            "+Contadores baseados nos registros do usuário",
+            "+Obras recentes no contexto",
+            "+Apresentação dos dados no template",
+          ],
+          "core/views/home.py: HomeTemplateView.get_context_data com count, filter e obras_recentes; core/templates/core/index.html.",
+          "Sem lacuna estática identificada.",
+          ["G02", "T2-PROPRIEDADE"],
+        ),
+        task(
+          "PAGINACAO",
+          "Paginação e controles de navegação",
+          8,
+          [
+            [2, 2, 3],
+            [3, 2, 4],
+          ],
+          "concluido",
+          "media",
+          "Capacidade única compartilhada pelos dois trimestres.",
+          [
+            "+paginate_by nas cinco ListView",
+            "+Componente com primeira, anterior, próxima e última",
+            "+Inclusão do componente nas listagens",
+          ],
+          "core/views/clientes.py, obras.py, documentos.py, atualizacoes.py: paginate_by=10; imagens.py: 9. core/templates/core/_pagination.html e templates de listas. core/tests.py inclui teste de página 2.",
+          "Quando filtros forem implementados, preservar parâmetros de busca nos links de paginação; hoje os links usam apenas ?page=.",
+          ["G03"],
+        ),
+        task(
+          "DEBUG",
+          "Ativar e utilizar Django Debug Toolbar",
+          9,
+          [
+            [2, 2, 3],
+            [3, 1, 4],
+          ],
+          "andamento",
+          "alta",
+          "Biblioteca declarada, mas não ativada no projeto.",
+          [
+            "+Dependência declarada em requirements.txt",
+            "-Ativar app e middleware em desenvolvimento",
+            "-Adicionar URLs e configuração local",
+            "-Registrar uso na inspeção de consultas",
+          ],
+          "requirements.txt: django-debug-toolbar==6.1.0. OrcamentoObra/settings.py não registra debug_toolbar nem middleware; urls.py não inclui suas URLs.",
+          "Ativar no ambiente de desenvolvimento e coletar evidências das consultas.",
+          ["G01"],
+        ),
+        task(
+          "OTIMIZACAO",
+          "Medir e otimizar consultas repetidas",
+          9,
+          [
+            [2, 2, 3],
+            [3, 1, 4],
+          ],
+          "andamento",
+          "alta",
+          "select_related existe na home; falta demonstração de melhoria.",
+          [
+            "+select_related em obras recentes",
+            "-Medir consultas repetidas com a Toolbar",
+            "-Aplicar select_related/prefetch_related onde necessário",
+            "-Registrar comparação antes e depois",
+          ],
+          'core/views/home.py: obras.select_related("cliente_principal"). Nenhum comparativo de contagem de queries localizado nos testes ou documentação inspecionados.',
+          "Medir antes de atribuir ganho. Não há N+1 comprovado apenas pela inspeção.",
+          ["DEBUG"],
+        ),
+        task(
+          "FILTROS",
+          "Filtros em pelo menos duas ListView",
+          7,
+          [[3, 1, 4]],
+          "backlog",
+          "alta",
+          "Implementar filtros de pesquisa com formulário e queryset.",
+          [
+            "-Filtro funcional em uma ListView",
+            "-Filtro funcional em uma segunda ListView",
+            "-Formulários correspondentes nos templates",
+            "-Combinar filtros, autorização e paginação",
+          ],
+          "core/filter.py está vazio. Nenhuma aplicação de FilterSet ou leitura de filtros de request.GET nas ListView inspecionadas. A filtragem por proprietário não substitui a pesquisa solicitada.",
+          "Implementar em ObraListView e ClienteListView, ou outras duas listagens pertinentes.",
+          ["G03", "T2-PROPRIEDADE"],
+        ),
+        task(
+          "LOOKUPS",
+          "Demonstrar icontains, exact, gte e lte",
+          7,
+          [[3, 1, 4]],
+          "backlog",
+          "alta",
+          "Usar os quatro critérios em filtros acessíveis pela interface.",
+          [
+            "-icontains para pesquisa parcial",
+            "-exact para correspondência exata",
+            "-gte para limite inferior",
+            "-lte para limite superior",
+          ],
+          "Nenhum conjunto de filtros de pesquisa com os quatro lookups localizado em core/views ou core/filter.py. Comparações exatas internas e email__iexact não comprovam o requisito completo.",
+          "Definir campos textuais, categóricos e intervalos compatíveis com o domínio.",
+          ["FILTROS"],
+        ),
+        task(
+          "G04",
+          "Movimento de negócio entre classes",
+          6,
+          [
+            [0, 0, 1],
+            [3, 2, 4],
+          ],
+          "andamento",
+          "alta",
+          "Criar orçamento recusa versões anteriores, mas altera registros da mesma classe.",
+          [
+            "+Regra além do CRUD em OrcamentoCreateView.form_valid",
+            "-Movimento altera coordenadamente outra classe de domínio",
+            "-Verificar consistência e tratamento de falhas do movimento",
+          ],
+          "core/views/orcamentos.py: form_valid cria Orcamento e atualiza outros Orcamento para RECUSADO. Não altera outra classe de domínio nesse fluxo. CadastroUsuarioView associa Group ao User, mas não comprova um movimento de negócio da obra.",
+          "Definir e implementar efeito de negócio em outra classe; considerar transação atômica e testar falhas.",
+          ["G03", "T2-PROPRIEDADE"],
+        ),
+        task(
+          "G08",
+          "Tecnologia front-end e duas bibliotecas",
+          10,
+          [
+            [0, 0, 1],
+            [3, 2, 4],
+          ],
+          "andamento",
+          "media",
+          "Bootstrap e galeria existem; não há duas integrações interativas comprovadas.",
+          [
+            "+Bootstrap e galeria de mídia presentes",
+            "-Aplicar jQuery ou tecnologia equivalente para interações",
+            "-Demonstrar duas bibliotecas funcionais nos fluxos",
+          ],
+          "core/templates/core/base.html: Bootstrap JS e Font Awesome CSS; obra/galeria.html usa abas Bootstrap e galeria HTML. Não foram localizadas integrações DataTables, máscaras ou jQuery nos templates ativos.",
+          "Adicionar recursos pertinentes e demonstrar duas bibliotecas funcionais. Ícones isolados não foram contados como segunda integração interativa.",
+          ["G05"],
+        ),
+        task(
+          "T3-UX",
+          "Validar interface amigável",
+          3,
+          [[3, 2, 4]],
+          "verificar",
+          "media",
+          "Avaliar legibilidade, feedback, formulários e uso móvel em execução.",
+          [
+            "-Revisar desktop e smartphone",
+            "-Validar mensagens, erros e estados vazios",
+            "-Validar foco e navegação por teclado",
+          ],
+          "Templates Bootstrap e CSS responsivo existem. Avaliação de usabilidade da aplicação Django não realizada.",
+          "Executar roteiro de uso com dados representativos.",
+          ["G05", "G03"],
+        ),
+        task(
+          "T3-NAVEGACAO",
+          "Validar coerência da navegação",
+          11,
+          [[3, 2, 4]],
+          "verificar",
+          "media",
+          "Percorrer os fluxos completos, retornos e links contextualizados.",
+          [
+            "-Percorrer CRUDs e retorno para a obra",
+            "-Verificar links, cancelamentos e permissões",
+            "-Validar login, logout e mudança de senha",
+          ],
+          "URLs e links nomeados presentes em core/urls.py e templates. Nenhuma sessão de navegação integral executada.",
+          "Homologar com usuário real e registrar resultados.",
+          ["G03", "G06"],
+        ),
+        task(
+          "T3-INTEGRACAO",
+          "Revisar funcionamento geral e integração",
+          11,
+          [[3, 2, 4]],
+          "andamento",
+          "alta",
+          "Há testes de acesso e paginação; faltam validações integrais.",
+          [
+            "+Testes de autenticação, grupo e paginação escritos",
+            "-Executar suíte no ambiente configurado",
+            "-Validar CRUDs, uploads e vínculo entre modelos",
+            "-Validar fluxo de negócio e banco Neon",
+          ],
+          "core/tests.py e usuarios/tests.py contêm testes. O venv/Scripts/python.exe aponta para Python 3.11 indisponível neste ambiente; execução não realizada.",
+          "Recriar/ajustar ambiente e executar suíte; ampliar cobertura dos fluxos. Falha do ambiente local não prova falha do sistema.",
+          ["T1-NEON", "G04", "G03"],
+        ),
+        task(
+          "G09",
+          "Versionamento Git e remoto",
+          12,
+          [
+            [0, 0, 1],
+            [0, 0, 5],
+          ],
+          "concluido",
+          "media",
+          "Histórico Git e remoto configurado encontrados.",
+          ["+Commits locais de evolução", "+Remoto origin configurado"],
+          "git log: ea34454 (paleta), a1ec635 (testes e acesso a orçamentos), 3d37dda (paginação e grupos). git remote retorna origin. Página 5 do PDF é referência de comandos.",
+          "Sincronização e disponibilidade do remoto não verificadas; não foi feito push.",
+        ),
+        task(
+          "ENTREGA-T1",
+          "Apresentação do primeiro trimestre",
+          11,
+          [
+            [1, 1, 2],
+            [1, 2, 2],
+          ],
+          "verificar",
+          "alta",
+          "Prazo 08/05/2026; recuperação 15/05/2026.",
+          ["-Registrar apresentação e validação do professor"],
+          "PDF p. 2. Não foi localizada comprovação de apresentação ou avaliação. Prazo vencido não comprova entrega.",
+          "Registrar evidência acadêmica; não inferir nota ou apresentação.",
+          ["G03", "T1-NEON"],
+        ),
+        task(
+          "ENTREGA-T2",
+          "Entregas do segundo trimestre",
+          11,
+          [
+            [2, 1, 3],
+            [2, 2, 3],
+          ],
+          "verificar",
+          "alta",
+          "Entregas 10/07 e 21/08/2026; recuperação 28/08/2026.",
+          [
+            "-Registrar entrega 1 e validação",
+            "-Registrar entrega 2 e validação",
+          ],
+          "PDF p. 3. Implementação no Git não comprova apresentação ao professor.",
+          "Acrescentar registros das entregas nas observações.",
+          ["G07", "PAGINACAO", "OTIMIZACAO"],
+        ),
+        task(
+          "ENTREGA-T3",
+          "Apresentação final do projeto",
+          11,
+          [[3, 2, 4]],
+          "verificar",
+          "alta",
+          "Apresentação em 04/12/2026; recuperação 11/12/2026.",
+          [
+            "-Concluir revisão geral",
+            "-Preparar demonstração dos requisitos",
+            "-Registrar apresentação e validação do professor",
+          ],
+          "PDF p. 4; evento futuro em relação à auditoria de 16/10/2026. Sem evidência de apresentação.",
+          "Preparar roteiro de demonstração; recuperação é alternativa, não requisito duplicado.",
+          ["T3-INTEGRACAO", "FILTROS", "LOOKUPS", "G08"],
+        ),
+      ];
+      /* 3. Estado e persistência. A auditoria SEED nunca é modificada pelas ações do usuário. */
+      const KEY = "orcamentoobra.kanban.v1";
+      const $ = (s) => document.querySelector(s),
+        $$ = (s) => [...document.querySelectorAll(s)];
+      const clone = (x) => JSON.parse(JSON.stringify(x));
+      const esc = (x) =>
+        String(x ?? "").replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[c],
+        );
+      const options = (obj, value) =>
+        Object.entries(obj)
+          .map(
+            ([k, v]) =>
+              `<option value="${esc(k)}" ${String(value) === k ? "selected" : ""}>${esc(v)}</option>`,
+          )
+          .join("");
+      const initial = () => ({
+        version: 1,
+        tasks: clone(SEED),
+        theme: "light",
+        filters: {},
+        sort: "manual",
+      });
+      let state = initial(),
+        storageBlocked = false,
+        activeTab = "board",
+        draft = null,
+        dragId = null,
+        dirty = false;
+      const isDate = (s) =>
+        s === "" ||
+        (/^\d{4}-\d{2}-\d{2}$/.test(s) &&
+          !Number.isNaN(Date.parse(s)) &&
+          new Date(s).toISOString().slice(0, 10) === s);
+      function validate(data) {
+        if (
+          !data ||
+          data.version !== 1 ||
+          !Array.isArray(data.tasks) ||
+          data.tasks.length > 1000
+        )
+          throw Error(
+            "Formato incompatível: esperado backup v1 com até 1.000 tarefas.",
+          );
+        if (
+          !["light", "dark"].includes(data.theme) ||
+          !["manual", "priority", "dueDate", "title"].includes(data.sort)
+        )
+          throw Error("Preferências inválidas.");
+        const ids = new Set();
+        for (const t of data.tasks) {
+          if (
+            !t ||
+            typeof t.id !== "string" ||
+            !/^[-A-Za-z0-9_]{1,80}$/.test(t.id) ||
+            ids.has(t.id)
+          )
+            throw Error("ID inválido ou duplicado.");
+          ids.add(t.id);
+          for (const k of [
+            "title",
+            "description",
+            "category",
+            "dueDate",
+            "evidence",
+            "pending",
+            "notes",
+            "blocker",
+            "verification",
+          ])
+            if (typeof t[k] !== "string" || t[k].length > 30000)
+              throw Error("Campo inválido: " + k);
+          if (
+            !t.title.trim() ||
+            !t.category.trim() ||
+            !Object.hasOwn(STATUS, t.status) ||
+            !Object.hasOwn(PRIORITY, t.priority) ||
+            !isDate(t.dueDate) ||
+            typeof t.archived !== "boolean" ||
+            typeof t.original !== "boolean"
+          )
+            throw Error("Tarefa com campos obrigatórios inválidos.");
+          if (
+            !Array.isArray(t.checklist) ||
+            t.checklist.length > 200 ||
+            t.checklist.some(
+              (c) =>
+                !c ||
+                typeof c.text !== "string" ||
+                !c.text.trim() ||
+                c.text.length > 1000 ||
+                typeof c.done !== "boolean",
+            )
+          )
+            throw Error("Checklist inválido.");
+          if (
+            !Array.isArray(t.refs) ||
+            !t.refs.length ||
+            t.refs.length > 20 ||
+            t.refs.some(
+              (r) =>
+                !Array.isArray(r) ||
+                r.length !== 3 ||
+                !Number.isInteger(r[0]) ||
+                r[0] < 0 ||
+                r[0] > 3 ||
+                !Number.isInteger(r[1]) ||
+                r[1] < 0 ||
+                r[1] > 2 ||
+                !Number.isInteger(r[2]) ||
+                r[2] < 0 ||
+                r[2] > 5,
+            )
+          )
+            throw Error("Referência acadêmica inválida.");
+          if (
+            !Array.isArray(t.dependencies) ||
+            t.dependencies.length > 100 ||
+            t.dependencies.some((d) => typeof d !== "string" || d === t.id)
+          )
+            throw Error("Dependências inválidas.");
+          const baseline = SEED.find((x) => x.id === t.id);
+          if (t.original !== !!baseline)
+            throw Error("Origem da tarefa inconsistente.");
+          if (
+            baseline &&
+            JSON.stringify(t.refs) !== JSON.stringify(baseline.refs)
+          )
+            throw Error(
+              "Referências acadêmicas originais devem ser preservadas.",
+            );
+        }
+        if (SEED.some((t) => !ids.has(t.id)))
+          throw Error(
+            "Backup incompleto: um requisito original está ausente. Arquive em vez de excluir.",
+          );
+        for (const t of data.tasks)
+          if (t.dependencies.some((d) => !ids.has(d)))
+            throw Error("Dependência aponta para tarefa inexistente.");
+        const visiting = new Set(),
+          done = new Set(),
+          map = new Map(data.tasks.map((t) => [t.id, t]));
+        function visit(id) {
+          if (visiting.has(id)) throw Error("Dependência circular.");
+          if (done.has(id)) return;
+          visiting.add(id);
+          map.get(id).dependencies.forEach(visit);
+          visiting.delete(id);
+          done.add(id);
+        }
+        data.tasks.forEach((t) => visit(t.id));
+        if (
+          !data.filters ||
+          typeof data.filters !== "object" ||
+          Array.isArray(data.filters) ||
+          Object.values(data.filters).some(
+            (v) => typeof v !== "string" || v.length > 1000,
+          )
+        )
+          throw Error("Filtros inválidos.");
+        return data;
+      }
+      function storageError(message) {
+        $("#storageError").hidden = false;
+        $("#storageError").textContent = message;
+      }
+      try {
+        const saved = localStorage.getItem(KEY);
+        if (saved) state = validate(JSON.parse(saved));
+      } catch (e) {
+        storageBlocked = true;
+        storageError(
+          "Não foi possível carregar os dados: " +
+            e.message +
+            " O inventário inicial foi aberto sem sobrescrever o armazenamento. Exporte os dados ou importe um backup válido.",
+        );
+      }
+      function persist() {
+        if (storageBlocked) return false;
+        try {
+          localStorage.setItem(KEY, JSON.stringify(state));
+          $("#storageError").hidden = true;
+          return true;
+        } catch (e) {
+          storageError(
+            "Alterações apenas em memória: armazenamento indisponível ou cheio. Exporte JSON antes de fechar.",
+          );
+          return false;
+        }
+      }
+      function toast(message) {
+        $("#toast").textContent = message;
+        $("#toast").hidden = false;
+        clearTimeout(toast.timer);
+        toast.timer = setTimeout(() => ($("#toast").hidden = true), 4200);
+      }
+      function changed(message = "Alteração salva") {
+        const saved = persist();
+        render();
+        toast(
+          saved ? message : message + " somente nesta sessão; exporte JSON.",
+        );
+      }
+      function today() {
+        return new Intl.DateTimeFormat("en-CA", {
+          timeZone: "America/Sao_Paulo",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        }).format(new Date());
+      }
+      const overdue = (t) =>
+        t.status !== "concluido" && t.dueDate && t.dueDate < today();
+      const date = (s) => (s ? s.split("-").reverse().join("/") : "Sem prazo");
+      const percent = (tasks) =>
+        tasks.length
+          ? Math.round(
+              (tasks.filter((t) => t.status === "concluido").length /
+                tasks.length) *
+                100,
+            )
+          : 0;
+      const refsText = (t) =>
+        t.refs
+          .map((r) =>
+            r[0]
+              ? `${r[0]}º tri · etapa ${r[1]} · PDF p. ${r[2]}`
+              : `Geral · PDF p. ${r[2]}`,
+          )
+          .join(" / ");
+      const trimmed = (s) => s.trim();
+      function matches(t) {
+        const f = state.filters,
+          q = (f.search || "").toLocaleLowerCase("pt-BR");
+        return (
+          !t.archived &&
+          (!q ||
+            [t.id, t.title, t.description].some((x) =>
+              x.toLocaleLowerCase("pt-BR").includes(q),
+            )) &&
+          t.refs.some(
+            (r) =>
+              (!f.trimester || String(r[0]) === f.trimester) &&
+              (!f.stage || String(r[1]) === f.stage),
+          ) &&
+          (!f.category || t.category === f.category) &&
+          (!f.priority || t.priority === f.priority) &&
+          (!f.status || t.status === f.status) &&
+          (!f.deadline ||
+            (f.deadline === "late"
+              ? overdue(t)
+              : f.deadline === "none"
+                ? !t.dueDate
+                : t.dueDate >= today() && t.status !== "concluido")) &&
+          (!f.blocker || (f.blocker === "yes" ? !!t.blocker : !t.blocker))
+        );
+      }
+      function sorted(list) {
+        return [...list].sort((a, b) =>
+          state.sort === "priority"
+            ? ["alta", "media", "baixa"].indexOf(a.priority) -
+              ["alta", "media", "baixa"].indexOf(b.priority)
+            : state.sort === "title"
+              ? a.title.localeCompare(b.title, "pt-BR")
+              : state.sort === "dueDate"
+                ? (a.dueDate || "9999").localeCompare(b.dueDate || "9999")
+                : 0,
+        );
+      }
+      /* 4. Apresentação: o conteúdo editável passa por esc(), nunca é interpretado como HTML. */
+      function renderMetrics() {
+        const total = state.tasks.length,
+          counts = Object.keys(STATUS).map(
+            (s) => state.tasks.filter((t) => t.status === s).length,
+          );
+        $("#metrics").innerHTML = [
+          [
+            "Total de tarefas",
+            total,
+            `${state.tasks.filter((t) => t.original).length} acadêmicas · ${state.tasks.filter((t) => t.archived).length} arquivadas`,
+          ],
+          ["Concluídas", counts[2], percent(state.tasks) + "% do inventário"],
+          ["Em andamento", counts[1], "Implementação parcial"],
+          ["Backlog", counts[0], "A implementar"],
+          ["A verificar", counts[3], "Sem comprovação suficiente"],
+          [
+            "Bloqueadas",
+            counts[4],
+            state.tasks.filter(overdue).length + " com prazo vencido no quadro",
+          ],
+        ]
+          .map(
+            ([label, value, sub]) =>
+              `<div class="metric"><small>${label}</small><strong>${value}</strong><small>${sub}</small></div>`,
+          )
+          .join("");
+        $("#progress").value = percent(state.tasks);
+        $("#progressLabel").textContent = percent(state.tasks) + "% concluído";
+      }
+      function renderFilters() {
+        const f = state.filters;
+        const specs = [
+          [
+            "trimester",
+            "Trimestre",
+            {
+              0: "Geral",
+              1: "1º trimestre",
+              2: "2º trimestre",
+              3: "3º trimestre",
+            },
+          ],
+          ["stage", "Etapa", { 1: "1ª etapa", 2: "2ª etapa" }],
+          [
+            "category",
+            "Categoria",
+            Object.fromEntries(
+              [
+                ...new Set([
+                  ...CATEGORIES,
+                  ...state.tasks.map((t) => t.category),
+                ]),
+              ].map((c) => [c, c]),
+            ),
+          ],
+          ["priority", "Prioridade", PRIORITY],
+          ["status", "Status", STATUS],
+          [
+            "deadline",
+            "Prazo",
+            { late: "Vencido", future: "Hoje ou futuro", none: "Sem prazo" },
+          ],
+          [
+            "blocker",
+            "Impedimento",
+            { yes: "Com impedimento", no: "Sem impedimento" },
+          ],
+        ];
+        $("#filters").innerHTML = specs
+          .map(
+            ([key, label, opts]) =>
+              `<label>${label}<select data-filter="${key}">${options({ "": "Todos", ...opts }, f[key] || "")}</select></label>`,
+          )
+          .join("");
+        $("#search").value = f.search || "";
+        $("#sort").value = state.sort;
+      }
+      function card(t) {
+        const n = t.checklist.filter((c) => c.done).length;
+        return `<article class="card" draggable="${state.sort === "manual"}" data-id="${esc(t.id)}"><div class="card-top"><span>${esc(t.id)}</span><span class="priority-${t.priority}">${t.priority === "alta" ? "↑ " : ""}${PRIORITY[t.priority]}</span></div><h3><button class="open" data-open="${esc(t.id)}">${esc(t.title)}</button></h3><p>${esc(t.description)}</p><div class="card-tags"><span class="tag">${[...new Set(t.refs.map((r) => r[0]))].map((n) => (n ? n + "º tri" : "Geral")).join(" · ")}</span><span class="tag">${esc(t.category)}</span></div><div class="card-foot"><span>Checklist ${n}/${t.checklist.length}</span><span>${date(t.dueDate)}${overdue(t) ? " · vencido" : ""}</span></div><progress value="${n}" max="${t.checklist.length || 1}" aria-label="Checklist ${n} de ${t.checklist.length}"></progress>${t.blocker ? `<small>⚑ ${esc(t.blocker)}</small>` : t.status === "verificar" ? "<small>○ Evidência pendente</small>" : ""}</article>`;
+      }
+      function renderBoard() {
+        const visible = state.tasks.filter(matches);
+        $("#resultCount").textContent =
+          `${visible.length} resultado(s) · ${state.tasks.filter((t) => t.priority === "alta" && !t.archived && t.status !== "concluido").length} prioridades abertas`;
+        $("#board").innerHTML = Object.entries(STATUS)
+          .map(([s, label]) => {
+            const list = sorted(visible.filter((t) => t.status === s));
+            return `<section class="column" style="--status:var(--${s})" data-status="${s}" aria-label="${label}"><header class="column-head"><span><i class="dot"></i>${label}</span><span class="count">${list.length}</span></header><div class="cards">${list.map(card).join("") || '<div class="empty">Nenhuma tarefa aqui.<br>Solte um card ou ajuste os filtros.</div>'}</div></section>`;
+          })
+          .join("");
+      }
+      function reportRows() {
+        return SEED.map((base) => {
+          const t = state.tasks.find((x) => x.id === base.id);
+          return `<tr><td><button data-open="${t.id}"><b>${t.id} · ${esc(t.title)}</b></button><p>${esc(refsText(base))}</p>${t.archived ? '<span class="tag">Arquivada · continua aplicável</span>' : ""}</td><td>${STATUS[t.status]}<p class="muted">Auditoria inicial: ${STATUS[base.status]}</p></td><td>${esc(base.evidence)}${t.evidence !== base.evidence ? `<p><b>Registro manual:</b> ${esc(t.evidence)}</p>` : ""}</td><td>${esc(t.pending)}${t.blocker ? `<p><b>Impedimento:</b> ${esc(t.blocker)}</p>` : ""}</td></tr>`;
+        }).join("");
+      }
+      function renderReport() {
+        const academic = state.tasks.filter((t) => t.original);
+        $("#reportView").innerHTML =
+          `<div class="section-heading actions"><h2 style="margin:0">Relatório de Conformidade</h2><button class="no-print" data-print>Imprimir / salvar PDF</button></div><p class="muted">${academic.length} capacidades e entregas únicas · ${percent(academic)}% concluído no quadro. Auditoria inicial: ${percent(SEED)}% com evidência estática suficiente.</p><div class="notice">Movimentações manuais e checklists representam acompanhamento. Não são novas evidências técnicas nem aprovação acadêmica. Auditoria inicial em 16/10/2026, revisão ea34454. Não foram executados os testes Django nem validada a conexão Neon.</div><div class="report-summary">${[
+            1, 2, 3,
+          ]
+            .map((n) => {
+              const a = academic.filter((t) =>
+                SEED.find((b) => b.id === t.id).refs.some((r) => r[0] === n),
+              );
+              return `<div class="panel"><h3>${n}º trimestre</h3><strong>${percent(a)}%</strong><progress value="${percent(a)}" max="100" aria-label="Progresso trimestre ${n}"></progress><p>${a.length} requisitos · ${a.filter((t) => t.status === "concluido").length} concluídos<br>${a.filter((t) => t.status === "andamento").length} parciais · ${a.filter((t) => t.status === "backlog").length} pendentes<br>${a.filter((t) => t.status === "verificar").length} não verificados · ${a.filter((t) => t.status === "bloqueado").length} bloqueados</p></div>`;
+            })
+            .join(
+              "",
+            )}</div><p class="muted">Capacidades compartilhadas aparecem nos trimestres correspondentes, sem duplicação no total. Requisitos gerais e arquivados estão na matriz abaixo. Tarefas pessoais não entram nesta matriz.</p><div class="table-wrap"><table><thead><tr><th>Requisito / trimestre</th><th>Status do quadro</th><th>Evidência técnica</th><th>Pendência / recomendação</th></tr></thead><tbody>${reportRows()}</tbody></table></div><h2 class="section-heading">O que falta para concluir o projeto?</h2><div class="steps"><div class="panel"><h3>Lacunas confirmadas no código</h3><p>Filtros de pesquisa e conjunto de lookups ausentes; Debug Toolbar não ativada; movimento de orçamento altera registros da mesma classe; diagrama possui tipos divergentes.</p></div><div class="panel"><h3>Verificações e recomendações</h3><p>Comprovar uso da Neon, medir otimização de consultas, validar duas integrações front-end e executar revisão integral. Não há prova de falha de segurança, de N+1 ou de entrega acadêmica apenas pela ausência de testes.</p></div></div><h3>Progresso por categoria (quadro acadêmico)</h3>${[
+            ...new Set(academic.map((t) => t.category)),
+          ]
+            .map((c) => {
+              const a = academic.filter((t) => t.category === c);
+              return `<p>${esc(c)} · ${percent(a)}% (${a.filter((t) => t.status === "concluido").length}/${a.length})</p>`;
+            })
+            .join("")}`;
+      }
+      function renderSteps() {
+        const tasks = state.tasks.filter(
+          (t) => !t.archived && t.status !== "concluido",
+        );
+        const rank = (t) =>
+          t.priority === "alta" ? 0 : t.priority === "media" ? 1 : 2;
+        const ordered = [...tasks].sort(
+          (a, b) =>
+            rank(a) - rank(b) ||
+            (a.dueDate || "9999").localeCompare(b.dueDate || "9999"),
+        );
+        $("#stepsView").innerHTML =
+          `<h2 class="section-heading">Próximos Passos</h2><p class="muted">Prioridade, depois prazo. Dependências abertas indicam o que resolver antes. Sem estimativas de esforço não fundamentadas.</p><div class="notice">Sequência técnica sugerida: comprovar Neon e ambiente → ativar Toolbar → medir queries → implementar filtros e lookups → completar movimento entre classes → validar integrações e demonstração final.</div><h3>Marcos do plano</h3><div class="timeline">${MILESTONES.map(([d, l]) => `<div><small>${esc(l)}</small><b>${date(d)}</b><small>${d < today() ? "Data passada; entrega não presumida" : "Próximo marco"}</small></div>`).join("")}</div><div class="steps">${
+            ordered
+              .map((t) => {
+                const open = t.dependencies
+                  .map((id) => state.tasks.find((x) => x.id === id))
+                  .filter((x) => x && x.status !== "concluido");
+                return `<article class="panel"><small>${t.id} · ${PRIORITY[t.priority]} · ${date(t.dueDate)}</small><h3>${esc(t.title)}</h3><p>${esc(t.pending || t.description)}</p>${open.length ? `<p><b>Dependências abertas:</b> ${open.map((x) => esc(x.id)).join(", ")}</p>` : ""}${t.blocker ? `<p><b>Impedimento registrado:</b> ${esc(t.blocker)}</p>` : ""}<button data-open="${t.id}">Abrir tarefa</button></article>`;
+              })
+              .join("") ||
+            '<div class="panel">Nenhuma tarefa ativa pendente. Confira as evidências no relatório.</div>'
+          }</div>`;
+      }
+      function renderArchive() {
+        const tasks = state.tasks.filter((t) => t.archived);
+        $("#archiveView").innerHTML =
+          `<h2 class="section-heading">Arquivadas (${tasks.length})</h2><p class="muted">Arquivar oculta do quadro, sem eliminar requisitos do relatório ou do progresso.</p><div class="steps">${tasks.map((t) => `<article class="panel"><small>${esc(t.id)}</small><h3>${esc(t.title)}</h3><button data-open="${esc(t.id)}">Abrir / restaurar</button></article>`).join("") || "<p>Nenhuma tarefa arquivada.</p>"}</div>`;
+      }
+      function render() {
+        document.documentElement.dataset.theme = state.theme;
+        $("#theme").textContent =
+          state.theme === "dark" ? "◐ Tema claro" : "◐ Tema escuro";
+        renderMetrics();
+        renderBoard();
+        renderReport();
+        renderSteps();
+        renderArchive();
+      }
+      function tab(name) {
+        activeTab = name;
+        $$("[data-tab]").forEach((b) =>
+          b.setAttribute("aria-selected", String(b.dataset.tab === name)),
+        );
+        ["board", "report", "steps", "archive", "help"].forEach(
+          (n) => ($("#" + n + "View").hidden = n !== name),
+        );
+      }
+      /* 5. Editor: rascunho separado permite cancelar sem alterar a tarefa. */
+      function field(label, name, value, type = "text", full = false) {
+        return `<label class="${full ? "full" : ""}">${label}${type === "textarea" ? `<textarea name="${name}" maxlength="30000">${esc(value)}</textarea>` : `<input name="${name}" type="${type}" value="${esc(value)}" ${name === "title" || name === "category" ? 'required maxlength="200"' : ""}>`}</label>`;
+      }
+      function selectField(label, name, obj, value) {
+        return `<label>${label}<select name="${name}">${options(obj, value)}</select></label>`;
+      }
+      function openTask(id) {
+        const existing = state.tasks.find((t) => t.id === id);
+        draft = existing
+          ? clone(existing)
+          : {
+              id:
+                "USER-" +
+                Date.now().toString(36) +
+                "-" +
+                Math.random().toString(36).slice(2, 6),
+              title: "",
+              description: "",
+              category: CATEGORIES[0],
+              refs: [[3, 2, 0]],
+              status: "backlog",
+              priority: "media",
+              dueDate: "",
+              checklist: [],
+              dependencies: [],
+              notes: "",
+              blocker: "",
+              evidence: "",
+              pending: "",
+              verification: "Registro manual não auditado",
+              original: false,
+              archived: false,
+            };
+        dirty = false;
+        $("#taskId").textContent =
+          draft.id +
+          (draft.original ? " · requisito acadêmico" : " · tarefa pessoal");
+        $("#dialogTitle").textContent = existing
+          ? "Detalhes da tarefa"
+          : "Nova tarefa";
+        $("#taskFields").innerHTML =
+          field("Título", "title", draft.title, "text", true) +
+          field(
+            "Descrição",
+            "description",
+            draft.description,
+            "textarea",
+            true,
+          ) +
+          field("Categoria", "category", draft.category) +
+          selectField("Prioridade", "priority", PRIORITY, draft.priority) +
+          selectField("Status do quadro", "status", STATUS, draft.status) +
+          field("Prazo", "dueDate", draft.dueDate, "date") +
+          (draft.original
+            ? `<div class="full"><b>Trimestre / etapa / fonte (preservados)</b><p>${esc(refsText(draft))}</p></div>`
+            : selectField(
+                "Trimestre",
+                "trimester",
+                { 0: "Geral", 1: "1º", 2: "2º", 3: "3º" },
+                draft.refs[0][0],
+              ) +
+              selectField(
+                "Etapa",
+                "stage",
+                { 1: "1ª", 2: "2ª" },
+                draft.refs[0][1],
+              )) +
+          `<label class="full">Dependências (Ctrl/Cmd para selecionar várias)<select name="dependencies" multiple size="4">${state.tasks
+            .filter((t) => t.id !== draft.id)
+            .map(
+              (t) =>
+                `<option value="${esc(t.id)}" ${draft.dependencies.includes(t.id) ? "selected" : ""}>${esc(t.id + " · " + t.title)}</option>`,
+            )
+            .join("")}</select></label>` +
+          selectField(
+            "Posição na coluna ao salvar",
+            "position",
+            {
+              keep: "Manter posição",
+              first: "Primeira posição",
+              last: "Última posição",
+              ...Object.fromEntries(
+                state.tasks
+                  .filter((t) => t.id !== draft.id && !t.archived)
+                  .map((t) => [
+                    "before:" + t.id,
+                    "Antes de " + t.id + " · " + STATUS[t.status],
+                  ]),
+              ),
+            },
+            "keep",
+          ) +
+          field(
+            "Impedimento (obrigatório se bloqueado)",
+            "blocker",
+            draft.blocker,
+          ) +
+          field("Observações", "notes", draft.notes, "textarea", true) +
+          field(
+            "Evidências registradas por você",
+            "evidence",
+            draft.evidence,
+            "textarea",
+            true,
+          ) +
+          field(
+            "Pendências e próximas ações",
+            "pending",
+            draft.pending,
+            "textarea",
+            true,
+          );
+        renderChecklist();
+        const base = SEED.find((t) => t.id === draft.id);
+        $("#auditDetails").innerHTML = base
+          ? `<section class="audit"><h3>Auditoria inicial · 16/10/2026</h3><p><b>Fonte:</b> Plano de Atividades e Avaliações 2026 · ${esc(refsText(base))}</p><p><b>Exigência:</b> ${esc(base.description)}</p><p><b>Status inicial:</b> ${STATUS[base.status]} · ${esc(base.verification)}</p><h3>Critérios de aceite</h3><ul>${base.checklist.map((c) => `<li>${esc(c.text)}</li>`).join("")}</ul><p><b>Identificado:</b> ${esc(base.evidence)}</p><p><b>Pendente / limitação:</b> ${esc(base.pending)}</p><p>Marcar itens ou mover este card não altera esta auditoria. Checklist e status são independentes. Execução integral do Django não validada.</p></section>`
+          : '<p class="audit">Tarefa pessoal, sem requisito original do PDF. Evidências inseridas aqui são registros manuais.</p>';
+        $("#archiveTask").hidden = !existing;
+        $("#archiveTask").textContent = draft.archived
+          ? "Restaurar"
+          : "Arquivar";
+        $("#deleteTask").hidden = !existing || draft.original;
+        $("#formError").hidden = true;
+        $("#taskDialog").showModal();
+      }
+      function renderChecklist() {
+        const n = draft.checklist.filter((c) => c.done).length;
+        $("#checkCount").textContent = n + "/" + draft.checklist.length;
+        $("#checkProgress").value = draft.checklist.length
+          ? (n / draft.checklist.length) * 100
+          : 0;
+        $("#checklist").innerHTML = draft.checklist
+          .map(
+            (c, i) =>
+              `<div class="check-row"><input type="checkbox" data-check="${i}" aria-label="Concluir subtarefa ${i + 1}" ${c.done ? "checked" : ""}><input type="text" data-checktext="${i}" aria-label="Texto da subtarefa ${i + 1}" value="${esc(c.text)}" maxlength="1000" required><button type="button" data-removecheck="${i}" aria-label="Remover subtarefa ${i + 1}">✕</button></div>`,
+          )
+          .join("");
+      }
+      function closeTask() {
+        if (!dirty || confirm("Descartar alterações não salvas?"))
+          $("#taskDialog").close();
+      }
+      function place(tasks, id, status, position = "last") {
+        const moving = tasks.find((t) => t.id === id);
+        if (!moving) return;
+        moving.status = status;
+        const old = tasks.indexOf(moving);
+        if (position === "keep") return;
+        tasks.splice(old, 1);
+        let index =
+          position === "first"
+            ? tasks.findIndex((t) => t.status === status && !t.archived)
+            : position.startsWith("before:")
+              ? tasks.findIndex((t) => t.id === position.slice(7))
+              : tasks
+                  .map((t) => t.status === status && !t.archived)
+                  .lastIndexOf(true) + 1;
+        if (index < 0 || (position === "last" && index === 0))
+          index = tasks.length;
+        tasks.splice(index, 0, moving);
+      }
+      $("#taskForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        try {
+          const form = new FormData(e.currentTarget);
+          for (const k of [
+            "title",
+            "description",
+            "category",
+            "status",
+            "priority",
+            "dueDate",
+            "blocker",
+            "notes",
+            "evidence",
+            "pending",
+          ])
+            draft[k] = String(form.get(k) || "").trim();
+          draft.dependencies = form.getAll("dependencies");
+          if (!draft.original)
+            draft.refs = [
+              [Number(form.get("trimester")), Number(form.get("stage")), 0],
+            ];
+          if (draft.status === "bloqueado" && !draft.blocker)
+            throw Error("Descreva o impedimento para bloquear a tarefa.");
+          const position = form.get("position");
+          if (position.startsWith("before:")) {
+            const target = state.tasks.find((t) => t.id === position.slice(7));
+            if (target.status !== draft.status)
+              throw Error(
+                "Escolha uma posição na mesma coluna do status selecionado.",
+              );
+          }
+          const next = clone(state),
+            i = next.tasks.findIndex((t) => t.id === draft.id);
+          if (i < 0) next.tasks.push(clone(draft));
+          else next.tasks[i] = clone(draft);
+          place(next.tasks, draft.id, draft.status, position);
+          validate(next);
+          state = next;
+          $("#taskDialog").close();
+          renderFilters();
+          changed("Tarefa salva");
+        } catch (err) {
+          $("#formError").hidden = false;
+          $("#formError").textContent = err.message;
+        }
+      });
+      $("#taskForm").addEventListener("input", (e) => {
+        dirty = true;
+        if (e.target.dataset.checktext !== undefined)
+          draft.checklist[Number(e.target.dataset.checktext)].text =
+            e.target.value;
+      });
+      $("#checklist").addEventListener("change", (e) => {
+        if (e.target.dataset.check !== undefined) {
+          draft.checklist[Number(e.target.dataset.check)].done =
+            e.target.checked;
+          dirty = true;
+          const n = draft.checklist.filter((c) => c.done).length;
+          $("#checkCount").textContent = n + "/" + draft.checklist.length;
+          $("#checkProgress").value = (n / (draft.checklist.length || 1)) * 100;
+        }
+      });
+      $("#checklist").addEventListener("click", (e) => {
+        const b = e.target.closest("[data-removecheck]");
+        if (b && confirm("Remover esta subtarefa?")) {
+          draft.checklist.splice(Number(b.dataset.removecheck), 1);
+          dirty = true;
+          renderChecklist();
+        }
+      });
+      $("#addCheck").onclick = () => {
+        if (draft.checklist.length >= 200)
+          return toast("Limite de 200 subtarefas.");
+        draft.checklist.push({ text: "", done: false });
+        dirty = true;
+        renderChecklist();
+        $("#checklist .check-row:last-child input[type=text]").focus();
+      };
+      $("#archiveTask").onclick = () => {
+        if (
+          confirm(
+            (draft.archived ? "Restaurar" : "Arquivar") +
+              " esta tarefa? Alterações não salvas no formulário serão descartadas.",
+          )
+        ) {
+          state.tasks.find((t) => t.id === draft.id).archived = !draft.archived;
+          $("#taskDialog").close();
+          changed();
+        }
+      };
+      $("#deleteTask").onclick = () => {
+        if (draft.original) return;
+        if (state.tasks.some((t) => t.dependencies.includes(draft.id)))
+          return toast(
+            "Esta tarefa é dependência de outra. Remova o vínculo antes de excluir.",
+          );
+        if (confirm("Excluir definitivamente esta tarefa pessoal?")) {
+          state.tasks = state.tasks.filter((t) => t.id !== draft.id);
+          $("#taskDialog").close();
+          changed("Tarefa excluída");
+        }
+      };
+      /* 6. Drag-and-drop nativo. O editor oferece a mesma operação por toque ou teclado. */
+      $("#board").addEventListener("dragstart", (e) => {
+        const card = e.target.closest(".card");
+        if (!card || state.sort !== "manual") {
+          e.preventDefault();
+          return;
+        }
+        dragId = card.dataset.id;
+        e.dataTransfer.setData("text/plain", dragId);
+        e.dataTransfer.effectAllowed = "move";
+        card.classList.add("dragging");
+      });
+      $("#board").addEventListener("dragover", (e) => {
+        if (!dragId) return;
+        const col = e.target.closest(".column");
+        if (!col) return;
+        e.preventDefault();
+        $$(".drop-over,.drop-before").forEach((x) =>
+          x.classList.remove("drop-over", "drop-before"),
+        );
+        col.classList.add("drop-over");
+        const card = e.target.closest(".card");
+        if (card && card.dataset.id !== dragId)
+          card.classList.add("drop-before");
+      });
+      $("#board").addEventListener("drop", (e) => {
+        e.preventDefault();
+        const col = e.target.closest(".column"),
+          card = e.target.closest(".card");
+        if (!col || !dragId) return;
+        const t = state.tasks.find((t) => t.id === dragId);
+        if (!t || card?.dataset.id === dragId) return;
+        if (col.dataset.status === "bloqueado" && !t.blocker) {
+          toast("Registre um impedimento no editor antes de bloquear.");
+          openTask(t.id);
+          return;
+        }
+        place(
+          state.tasks,
+          t.id,
+          col.dataset.status,
+          card ? "before:" + card.dataset.id : "last",
+        );
+        dragId = null;
+        changed("Card movido; evidências preservadas");
+      });
+      $("#board").addEventListener("dragend", () => {
+        dragId = null;
+        $$(".dragging,.drop-over,.drop-before").forEach((x) =>
+          x.classList.remove("dragging", "drop-over", "drop-before"),
+        );
+      });
+      /* 7. Backups: validação completa antes de substituir o estado. */
+      function download(name, content, type) {
+        const url = URL.createObjectURL(new Blob([content], { type })),
+          a = document.createElement("a");
+        a.href = url;
+        a.download = name;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
+      function summary() {
+        return (
+          `ORCAMENTOOBRA — RELATÓRIO DE CONFORMIDADE\nGerado em ${date(today())}\nAuditoria inicial: 16/10/2026 · ea34454 · análise estática\nProgresso do quadro: ${percent(state.tasks)}% (${state.tasks.length} tarefas, inclusive arquivadas e não verificadas)\nAuditoria inicial: ${percent(SEED)}% com evidência estática suficiente. Testes Django e conexão Neon não executados.\n\n` +
+          Object.entries(STATUS)
+            .map(
+              ([s, l]) =>
+                l + ": " + state.tasks.filter((t) => t.status === s).length,
+            )
+            .join("\n") +
+          "\n\n" +
+          SEED.map((base) => {
+            const t = state.tasks.find((x) => x.id === base.id);
+            return `${t.id} — ${t.title}\n${refsText(base)}\nQuadro: ${STATUS[t.status]} | Auditoria inicial: ${STATUS[base.status]}\nEvidência: ${base.evidence}\nRegistro manual: ${t.evidence}\nPendência: ${t.pending}\nObservações: ${t.notes}\n`;
+          }).join("\n")
+        );
+      }
+      $("#export").onclick = () =>
+        download(
+          "orcamentoobra-kanban-" + today() + ".json",
+          JSON.stringify(state, null, 2),
+          "application/json",
+        );
+      $("#exportReport").onclick = () =>
+        download(
+          "relatorio-conformidade-" + today() + ".txt",
+          summary(),
+          "text/plain;charset=utf-8",
+        );
+      $("#importFile").onchange = async (e) => {
+        try {
+          const file = e.target.files[0];
+          if (!file) return;
+          if (file.size > 5000000) throw Error("Arquivo excede 5 MB.");
+          const next = validate(JSON.parse(await file.text()));
+          if (
+            !confirm(
+              "Importar " +
+                next.tasks.length +
+                " tarefas e substituir o quadro atual? Exporte um backup antes de continuar.",
+            )
+          )
+            return;
+          state = clone(next);
+          storageBlocked = false;
+          renderFilters();
+          changed("Backup importado");
+          $("#settingsDialog").close();
+        } catch (err) {
+          toast("Importação rejeitada: " + err.message);
+        } finally {
+          e.target.value = "";
+        }
+      };
+      $("#reset").onclick = () => {
+        if (
+          confirm(
+            "Restaurar o inventário inicial e descartar todas as alterações locais?",
+          )
+        ) {
+          state = initial();
+          storageBlocked = false;
+          renderFilters();
+          changed("Inventário restaurado");
+          $("#settingsDialog").close();
+        }
+      };
+      function printReport() {
+        if ($("#settingsDialog").open) $("#settingsDialog").close();
+        tab("report");
+        renderReport();
+        window.print();
+      }
+      /* 8. Eventos de navegação e inicialização. */
+      document.addEventListener("click", (e) => {
+        const open = e.target.closest("[data-open]");
+        if (open) openTask(open.dataset.open);
+        else if (e.target.closest("[data-print]")) printReport();
+        else {
+          const b = e.target.closest("[data-tab]");
+          if (b) tab(b.dataset.tab);
+        }
+      });
+      $("#board").addEventListener("click", (e) => {
+        if (e.target.closest("button")) return;
+        const card = e.target.closest(".card");
+        if (card) openTask(card.dataset.id);
+      });
+      $("#newTask").onclick = () => openTask();
+      $("#closeTask").onclick = closeTask;
+      $("#cancelTask").onclick = closeTask;
+      $("#taskDialog").addEventListener("cancel", (e) => {
+        e.preventDefault();
+        closeTask();
+      });
+      $("#taskDialog").addEventListener("click", (e) => {
+        if (e.target === $("#taskDialog")) {
+          const r = e.target.getBoundingClientRect();
+          if (
+            e.clientX < r.left ||
+            e.clientX > r.right ||
+            e.clientY < r.top ||
+            e.clientY > r.bottom
+          )
+            closeTask();
+        }
+      });
+      $("#settings").onclick = () => $("#settingsDialog").showModal();
+      $("#closeSettings").onclick = () => $("#settingsDialog").close();
+      $("#printReport").onclick = printReport;
+      $("#theme").onclick = () => {
+        state.theme = state.theme === "light" ? "dark" : "light";
+        changed("Tema atualizado");
+      };
+      $("#toggleFilters").onclick = () => {
+        $("#filters").hidden = !$("#filters").hidden;
+        $("#toggleFilters").setAttribute(
+          "aria-expanded",
+          String(!$("#filters").hidden),
+        );
+      };
+      $("#filters").onchange = (e) => {
+        if (e.target.dataset.filter) {
+          state.filters[e.target.dataset.filter] = e.target.value;
+          persist();
+          renderBoard();
+        }
+      };
+      $("#search").oninput = (e) => {
+        state.filters.search = e.target.value;
+        persist();
+        renderBoard();
+      };
+      $("#sort").onchange = (e) => {
+        state.sort = e.target.value;
+        persist();
+        renderBoard();
+        toast(
+          state.sort === "manual"
+            ? "Arrastar habilitado"
+            : "Ordenação visual; use ordem personalizada para arrastar.",
+        );
+      };
+      $("#clearFilters").onclick = () => {
+        state.filters = {};
+        state.sort = "manual";
+        renderFilters();
+        persist();
+        renderBoard();
+      };
+      renderFilters();
+      render();
+    </script>
+  </body>
+</html>

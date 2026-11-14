@@ -1,0 +1,34 @@
+{% extends "ia/base.html" %}
+
+{% block ia_content %}
+<p class="text-muted">{{ mes|date:"F Y"|capfirst }}</p>
+<div class="row g-3 mb-4" aria-label="Consumo de tokens no mês">
+    <div class="col-sm-6 col-lg-3">
+        <div class="metric-card">
+            <p class="metric-label">Cota mensal</p>
+            <strong>{{ cota }}</strong>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="metric-card">
+            <p class="metric-label">Tokens consumidos</p>
+            <strong>{{ usados }}</strong>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="metric-card">
+            <p class="metric-label">Tokens em processamento</p>
+            <strong>{{ reservados }}</strong>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="metric-card metric-card-accent">
+            <p class="metric-label">Saldo disponível</p>
+            <strong>{{ saldo }}</strong>
+        </div>
+    </div>
+</div>
+
+<h2 class="h5 mb-3">Requisições do mês</h2>
+{% include "ia/_requisicoes.html" %}
+{% endblock %}

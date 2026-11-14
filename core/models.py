@@ -111,6 +111,13 @@ class Documento(models.Model):
         OUTRO = "OUTRO", "Outro"
 
     obra = models.ForeignKey(Obra, on_delete=models.CASCADE, related_name="documentos")
+    cadastrado_por = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        related_name="documentos_cadastrados",
+        null=True,
+        blank=True,
+    )
     titulo = models.CharField(max_length=150)
     tipo_documento = models.CharField(max_length=20, choices=TipoDocumento.choices)
     arquivo = models.FileField(upload_to=documento_upload_path)
@@ -142,6 +149,13 @@ class AtualizacaoObra(models.Model):
     
 class ImagemObra(models.Model):
     obra = models.ForeignKey(Obra, on_delete=models.CASCADE, related_name="imagens")
+    cadastrado_por = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        related_name="imagens_cadastradas",
+        null=True,
+        blank=True,
+    )
     atualizacao_obra = models.ForeignKey(
         AtualizacaoObra,
         on_delete=models.SET_NULL,

@@ -1,0 +1,54 @@
+{% extends "ia/base.html" %}
+
+{% block ia_content %}
+<p class="text-muted">Consumo de {{ mes|date:"F Y" }}. Cota padrão de {{ cota_padrao }} tokens.</p>
+<div class="card">
+    <div class="card-body">
+        {% if usuarios %}
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th scope="col">Usuário</th>
+                            <th scope="col">Acesso</th>
+                            <th scope="col">Cota mensal</th>
+                            <th scope="col">Tokens consumidos</th>
+                            <th scope="col" class="text-end">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for usuario in usuarios %}
+                            <tr>
+                                <th scope="row">{{ usuario.get_username }}</th>
+                                <td>
+                                    {% if not usuario.is_active %}
+                                        Conta inativa
+                                    {% elif usuario.acesso_ia.ativo %}
+                                        Ativo
+                                    {% else %}
+                                        Desativado
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if usuario.acesso_ia %}
+                                        {{ usuario.acesso_ia.cota_mensal|default_if_none:"Padrão" }}
+                                    {% else %}
+                                        Padrão
+                                    {% endif %}
+                                </td>
+                                <td>{{ usuario.tokens_usados|default_if_none:0 }}</td>
+                                <td class="text-end">
+                                    <a class="btn btn-sm btn-outline-primary" href="{% url 'ia:editar_acesso' usuario.pk %}">Editar acesso</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="mb-0">Nenhum usuário encontrado.</p>
+        {% endif %}
+    </div>
+</div>
+{% include "core/_pagination.html" %}
+{% endblock %}

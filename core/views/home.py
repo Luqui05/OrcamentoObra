@@ -1,15 +1,13 @@
 from django.views.generic import TemplateView
-from django.db.models import Q
 
 from core.models import (
     AtualizacaoObra,
     Cliente,
     Documento,
     ImagemObra,
-    Obra,
     Orcamento,
 )
-from core.views.mixins import ClienteGroupRequiredMixin, LoginRequiredMixin
+from core.views.mixins import ClienteGroupRequiredMixin, LoginRequiredMixin, obras_do_usuario
 
 
 class HomeTemplateView(LoginRequiredMixin, ClienteGroupRequiredMixin, TemplateView):
@@ -17,10 +15,7 @@ class HomeTemplateView(LoginRequiredMixin, ClienteGroupRequiredMixin, TemplateVi
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        obras = Obra.objects.filter(
-            Q(cliente_principal__usuario=self.request.user)
-            | Q(clientes__usuario=self.request.user)
-        ).distinct()
+        obras = obras_do_usuario(self.request.user)
         orcamentos = Orcamento.objects.filter(obra__in=obras)
         context["total_clientes"] = Cliente.objects.filter(
             usuario=self.request.user
@@ -30,8 +25,12 @@ class HomeTemplateView(LoginRequiredMixin, ClienteGroupRequiredMixin, TemplateVi
         context["orcamentos_pendentes"] = orcamentos.filter(
             status=Orcamento.StatusChoices.PENDENTE
         ).count()
-        context["total_documentos"] = Documento.objects.filter(obra__in=obras).count()
-        context["total_imagens"] = ImagemObra.objects.filter(obra__in=obras).count()
+        context["total_documentos"] = Documento.objects.filter(
+            obra__in=obras, cadastrado_por=self.request.user
+        ).count()
+        context["total_imagens"] = ImagemObra.objects.filter(
+            obra__in=obras, cadastrado_por=self.request.user
+        ).count()
         context["total_atualizacoes"] = AtualizacaoObra.objects.filter(
             obra__in=obras
         ).count()

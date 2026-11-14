@@ -46,8 +46,11 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "crispy_forms",
     "crispy_bootstrap5",
+    "django_filters",
+    "debug_toolbar",
     "core.apps.CoreConfig",
     "usuarios.apps.UsuariosConfig",
+    "ia.apps.IaConfig",
 ]
 
 MIDDLEWARE = [
@@ -56,6 +59,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -181,3 +185,31 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 # config de e-mail em desenvolvimento
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+# Django Debug Toolbar (disponível apenas durante o desenvolvimento local).
+INTERNAL_IPS = ["127.0.0.1", "::1"]
+
+
+def show_debug_toolbar(request):
+    """Evita expor conteúdo de IA ou requisições comuns na barra de debug."""
+    from django.conf import settings
+
+    return (
+        settings.DEBUG
+        and request.META.get("REMOTE_ADDR") in INTERNAL_IPS
+        and request.user.is_authenticated
+        and request.user.is_superuser
+        and not request.path_info.startswith("/ia/")
+    )
+
+
+DEBUG_TOOLBAR_CONFIG = {
+    "SHOW_TOOLBAR_CALLBACK": "OrcamentoObra.settings.show_debug_toolbar",
+    # O callback consulta settings.DEBUG em cada request e a barra é oculta em testes.
+    "IS_RUNNING_TESTS": False,
+    "DISABLE_PANELS": [
+        "debug_toolbar.panels.history.HistoryPanel",
+        "debug_toolbar.panels.profiling.ProfilingPanel",
+        "debug_toolbar.panels.redirects.RedirectsPanel",
+    ],
+}

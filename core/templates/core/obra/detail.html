@@ -12,18 +12,18 @@
     .obra-section-card {
         border: 0;
         border-radius: 1rem;
-        box-shadow: 0 0.5rem 1.5rem rgba(15, 23, 42, 0.08);
+        box-shadow: var(--oo-shadow-soft);
     }
 
     .obra-carousel-card {
         border: 0;
         border-radius: 1rem;
         overflow: hidden;
-        box-shadow: 0 0.5rem 1.5rem rgba(15, 23, 42, 0.08);
+        box-shadow: var(--oo-shadow-soft);
     }
 
     .obra-carousel-media {
-        background: #f8fafc;
+        background: var(--oo-surface-soft);
         min-height: 240px;
         display: flex;
         align-items: center;
@@ -44,7 +44,7 @@
 
     .carousel-control-prev-icon,
     .carousel-control-next-icon {
-        background-color: rgba(15, 23, 42, 0.75);
+        background-color: rgba(41, 45, 50, 0.82);
         border-radius: 999px;
         background-size: 55% 55%;
         width: 3rem;
@@ -160,9 +160,9 @@
                             <div class="card mx-auto obra-carousel-card" style="max-width: 920px;">
                                 <div class="row g-0">
                                     <div class="col-md-5">
-                                            {% if atualizacao.imagens.first %}
+                                            {% if atualizacao.imagens_visiveis %}
                                                 <div class="obra-carousel-media h-100">
-                                                    <img src="{{ atualizacao.imagens.first.imagem.url }}" class="img-fluid" alt="Imagem da atualização">
+                                                    <img src="{% url 'imagem_arquivo' atualizacao.imagens_visiveis.0.pk %}" class="img-fluid" alt="Imagem da atualização">
                                                 </div>
                                         {% else %}
                                             <div class="obra-carousel-media text-muted border-end">

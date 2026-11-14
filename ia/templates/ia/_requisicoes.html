@@ -1,0 +1,44 @@
+<section class="card" aria-label="Registros de requisições">
+    <div class="card-body">
+        {% if requisicoes %}
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th scope="col">Data</th>
+                            {% if mostrar_usuario %}<th scope="col">Usuário</th>{% endif %}
+                            <th scope="col">Origem</th>
+                            <th scope="col">Modelo</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Entrada</th>
+                            <th scope="col">Saída</th>
+                            <th scope="col">Tokens debitados</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for requisicao in requisicoes %}
+                            <tr>
+                                <td class="text-nowrap">{{ requisicao.criada_em|date:"d/m/Y H:i" }}</td>
+                                {% if mostrar_usuario %}
+                                    <td>{{ requisicao.usuario.get_username|default:"Conta removida" }}</td>
+                                {% endif %}
+                                <td>{{ requisicao.get_origem_display }}</td>
+                                <td>{{ requisicao.modelo|default:"—" }}</td>
+                                <td>
+                                    {{ requisicao.get_status_display }}
+                                    {% if requisicao.detalhe %}<small class="d-block text-muted">{{ requisicao.detalhe }}</small>{% endif %}
+                                </td>
+                                <td>{{ requisicao.tokens_entrada|default_if_none:"—" }}</td>
+                                <td>{{ requisicao.tokens_saida|default_if_none:"—" }}</td>
+                                <td>{{ requisicao.tokens_debitados }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="mb-0">Nenhuma requisição registrada.</p>
+        {% endif %}
+    </div>
+</section>
+{% include "core/_pagination.html" %}
