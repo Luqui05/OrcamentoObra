@@ -1,23 +1,28 @@
+from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
+from core.filter import ClienteFilter
 from core.forms import ClienteForm
 from core.models import Cliente
 from core.views.mixins import (
     ClienteGroupRequiredMixin,
+    FilteredListMixin,
     LoginRequiredMixin,
     UserScopedQuerySetMixin,
 )
 
 
 class ClienteListView(
-    LoginRequiredMixin, ClienteGroupRequiredMixin, UserScopedQuerySetMixin, ListView
+    LoginRequiredMixin, ClienteGroupRequiredMixin, FilteredListMixin,
+    UserScopedQuerySetMixin, ListView
 ):
     model = Cliente
     template_name = "core/cliente/list.html"
     context_object_name = "clientes"
     user_filter = "usuario"
     paginate_by = 10
+    filterset_class = ClienteFilter
 
 
 class ClienteDetailView(
@@ -29,7 +34,13 @@ class ClienteDetailView(
     user_filter = "usuario"
 
 
-class ClienteCreateView(LoginRequiredMixin, ClienteGroupRequiredMixin, CreateView):
+class ClienteCreateView(
+    LoginRequiredMixin,
+    ClienteGroupRequiredMixin,
+    SuccessMessageMixin,
+    CreateView,
+):
+    success_message = "Cliente cadastrado."
     model = Cliente
     form_class = ClienteForm
     template_name = "core/form.html"
@@ -46,8 +57,13 @@ class ClienteCreateView(LoginRequiredMixin, ClienteGroupRequiredMixin, CreateVie
 
 
 class ClienteUpdateView(
-    LoginRequiredMixin, ClienteGroupRequiredMixin, UserScopedQuerySetMixin, UpdateView
+    LoginRequiredMixin,
+    ClienteGroupRequiredMixin,
+    UserScopedQuerySetMixin,
+    SuccessMessageMixin,
+    UpdateView,
 ):
+    success_message = "Cliente atualizado."
     model = Cliente
     form_class = ClienteForm
     template_name = "core/form.html"
@@ -61,8 +77,13 @@ class ClienteUpdateView(
 
 
 class ClienteDeleteView(
-    LoginRequiredMixin, ClienteGroupRequiredMixin, UserScopedQuerySetMixin, DeleteView
+    LoginRequiredMixin,
+    ClienteGroupRequiredMixin,
+    UserScopedQuerySetMixin,
+    SuccessMessageMixin,
+    DeleteView,
 ):
+    success_message = "Cliente excluído."
     model = Cliente
     template_name = "core/confirm_delete.html"
     success_url = reverse_lazy("cliente_list")

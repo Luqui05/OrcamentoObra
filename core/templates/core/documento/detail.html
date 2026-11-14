@@ -15,7 +15,7 @@
         <p><strong>Tipo:</strong> {{ documento.get_tipo_documento_display }}</p>
         <p><strong>Descrição:</strong><br>{{ documento.descricao|linebreaks }}</p>
         {% if documento.arquivo %}
-        <p><a href="{{ documento.arquivo.url }}" target="_blank" class="btn btn-primary">Baixar arquivo</a></p>
+        <p><a href="{% url 'documento_arquivo' documento.pk %}" target="_blank" class="btn btn-primary">Baixar arquivo</a></p>
         {% endif %}
     </div>
 </div>

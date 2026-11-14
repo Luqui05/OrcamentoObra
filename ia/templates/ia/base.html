@@ -1,0 +1,23 @@
+{% extends "core/base.html" %}
+
+{% block title %}{{ titulo_ia }}{% endblock %}
+
+{% block content %}
+<div class="page-heading">
+    <h1 class="h3">{{ titulo_ia }}</h1>
+</div>
+
+{% with rota=request.resolver_match.url_name %}
+<nav class="d-flex flex-wrap gap-2 mb-4" aria-label="Inteligência artificial">
+    <a href="{% url 'ia:assistente' %}" class="btn btn-sm {% if rota == 'assistente' %}btn-primary{% else %}btn-outline-primary{% endif %}" {% if rota == 'assistente' %}aria-current="page"{% endif %}>Assistente</a>
+    <a href="{% url 'ia:meu_consumo' %}" class="btn btn-sm {% if rota == 'meu_consumo' %}btn-primary{% else %}btn-outline-primary{% endif %}" {% if rota == 'meu_consumo' %}aria-current="page"{% endif %}>Meu consumo</a>
+    {% if request.user.is_superuser %}
+        <a href="{% url 'ia:requisicoes' %}" class="btn btn-sm {% if rota == 'requisicoes' %}btn-primary{% else %}btn-outline-primary{% endif %}" {% if rota == 'requisicoes' %}aria-current="page"{% endif %}>Requisições</a>
+        <a href="{% url 'ia:configuracao' %}" class="btn btn-sm {% if rota == 'configuracao' %}btn-primary{% else %}btn-outline-primary{% endif %}" {% if rota == 'configuracao' %}aria-current="page"{% endif %}>Configuração</a>
+        <a href="{% url 'ia:ia_por_usuario' %}" class="btn btn-sm {% if rota == 'ia_por_usuario' %}btn-primary{% else %}btn-outline-primary{% endif %}" {% if rota == 'ia_por_usuario' %}aria-current="page"{% endif %}>IA por usuário</a>
+    {% endif %}
+</nav>
+{% endwith %}
+
+{% block ia_content %}{% endblock %}
+{% endblock %}

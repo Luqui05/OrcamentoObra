@@ -2,17 +2,35 @@
 
 {% block title %}Obras{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.11/css/dataTables.bootstrap5.min.css">
+{% endblock %}
+
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="mb-0">Obras</h2>
     <a href="{% url 'obra_create' %}" class="btn btn-primary">Nova obra</a>
 </div>
 
+<form method="get" class="row g-3 align-items-end mb-3">
+    {% for field in filter.form %}
+        <div class="col-sm-auto">
+            {{ field.label_tag }}
+            {{ field }}
+            {{ field.errors }}
+        </div>
+    {% endfor %}
+    <div class="col-sm-auto">
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+        <a href="{% url 'obra_list' %}" class="btn btn-outline-secondary">Limpar</a>
+    </div>
+</form>
+
 <div class="card shadow-sm">
     <div class="card-body">
         {% if obras %}
             <div class="table-responsive">
-                <table class="table table-striped align-middle">
+                <table id="obras-table" class="table table-striped align-middle">
                     <thead>
                         <tr>
                             <th>Título</th>
@@ -28,7 +46,7 @@
                                 <td>{{ obra.titulo }}</td>
                                 <td>{{ obra.cliente_principal.nome }}</td>
                                 <td>{{ obra.endereco }}</td>
-                                <td>{{ obra.data_cadastro|date:"d/m/Y H:i" }}</td>
+                                <td data-order="{{ obra.data_cadastro|date:'U' }}">{{ obra.data_cadastro|date:"d/m/Y H:i" }}</td>
                                 <td class="text-end">
                                     <a href="{% url 'obra_detail' obra.pk %}" class="btn btn-sm btn-outline-primary">Detalhar</a>
                                     <a href="{% url 'obra_update' obra.pk %}" class="btn btn-sm btn-outline-secondary">Editar</a>
@@ -40,9 +58,27 @@
                 </table>
             </div>
         {% else %}
-            <p class="mb-0">Nenhuma obra cadastrada.</p>
+            <p class="mb-0">Nenhuma obra encontrada.</p>
         {% endif %}
     </div>
 </div>
 {% include "core/_pagination.html" %}
+{% endblock %}
+
+{% block extra_js %}
+{% if obras %}
+<script src="https://cdn.datatables.net/1.13.11/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.11/js/dataTables.bootstrap5.min.js"></script>
+<script>
+    if (window.jQuery && jQuery.fn.DataTable) {
+        jQuery("#obras-table").DataTable({
+            paging: false,
+            searching: false,
+            info: false,
+            order: [],
+            columnDefs: [{ targets: -1, orderable: false }]
+        });
+    }
+</script>
+{% endif %}
 {% endblock %}

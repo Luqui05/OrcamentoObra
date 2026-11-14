@@ -8,6 +8,20 @@
     <a href="{% url 'cliente_create' %}" class="btn btn-primary">Novo cliente</a>
 </div>
 
+<form method="get" class="row g-3 align-items-end mb-3">
+    {% for field in filter.form %}
+        <div class="col-sm-auto">
+            {{ field.label_tag }}
+            {{ field }}
+            {{ field.errors }}
+        </div>
+    {% endfor %}
+    <div class="col-sm-auto">
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+        <a href="{% url 'cliente_list' %}" class="btn btn-outline-secondary">Limpar</a>
+    </div>
+</form>
+
 <div class="card shadow-sm">
     <div class="card-body">
         {% if clientes %}
@@ -40,7 +54,7 @@
                 </table>
             </div>
         {% else %}
-            <p class="mb-0">Nenhum cliente cadastrado.</p>
+            <p class="mb-0">Nenhum cliente encontrado.</p>
         {% endif %}
     </div>
 </div>

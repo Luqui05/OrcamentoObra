@@ -1,5 +1,7 @@
 ﻿from django import forms
 
+from django.db.models import Q
+
 from .models import (
     AtualizacaoObra,
     Cliente,
@@ -28,9 +30,13 @@ class ObraForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         if usuario is not None:
-            clientes = Cliente.objects.filter(usuario=usuario)
-            self.fields["clientes"].queryset = clientes
-            self.fields["cliente_principal"].queryset = clientes
+            clientes = Q(usuario=usuario)
+            principais = clientes
+            if self.instance.pk:
+                clientes = clientes | Q(pk__in=self.instance.clientes.values("pk"))
+                principais = principais | Q(pk=self.instance.cliente_principal_id)
+            self.fields["clientes"].queryset = Cliente.objects.filter(clientes)
+            self.fields["cliente_principal"].queryset = Cliente.objects.filter(principais)
 
     class Meta:
         model = Obra
@@ -53,6 +59,30 @@ class ObraForm(forms.ModelForm):
                 "cliente_principal",
                 "O cliente principal deve estar entre os clientes da obra.",
             )
+
+        if self.instance.pk and cliente_principal and clientes is not None:
+            usuarios_selecionados = {cliente.usuario_id for cliente in clientes}
+            usuarios_selecionados.add(cliente_principal.usuario_id)
+            usuarios_removidos = (
+                Cliente.objects.filter(
+                    Q(pk=self.instance.cliente_principal_id)
+                    | Q(pk__in=self.instance.clientes.values("pk"))
+                )
+                .exclude(usuario_id__in=usuarios_selecionados)
+                .values("usuario_id")
+            )
+            if (
+                self.instance.documentos.filter(
+                    cadastrado_por_id__in=usuarios_removidos
+                ).exists()
+                or self.instance.imagens.filter(
+                    cadastrado_por_id__in=usuarios_removidos
+                ).exists()
+            ):
+                self.add_error(
+                    "clientes",
+                    "Mantenha vinculados à obra os clientes que cadastraram documentos ou imagens.",
+                )
 
         return cleaned_data
 

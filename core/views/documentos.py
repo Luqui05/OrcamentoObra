@@ -1,79 +1,69 @@
+from django.contrib.messages.views import SuccessMessageMixin
+from django.db import transaction
 from django.urls import reverse_lazy
-from django.db.models import Q
-from django.shortcuts import get_object_or_404
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 from core.forms import DocumentoForm
-from core.models import Documento, Obra
+from core.models import Documento
 from core.views.mixins import (
     ClienteGroupRequiredMixin,
     LoginRequiredMixin,
-    UserScopedQuerySetMixin,
+    ObraContextMixin,
+    ObraRelatedQuerySetMixin,
+    AutorQuerySetMixin,
 )
 
 
-class DocumentoListView(LoginRequiredMixin, ClienteGroupRequiredMixin, ListView):
+class DocumentoListView(
+    LoginRequiredMixin,
+    ClienteGroupRequiredMixin,
+    ObraContextMixin,
+    AutorQuerySetMixin,
+    ListView,
+):
     model = Documento
     template_name = "core/documento/list.html"
     context_object_name = "documentos"
     paginate_by = 10
 
     def get_queryset(self):
-        obra_pk = self.kwargs.get("obra_pk")
-        return Documento.objects.filter(
-            Q(obra__cliente_principal__usuario=self.request.user)
-            | Q(obra__clientes__usuario=self.request.user),
-            obra__pk=obra_pk,
-        ).distinct()
+        return super().get_queryset().filter(obra=self.obra)
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        obra_pk = self.kwargs.get("obra_pk")
-        context["obra"] = get_object_or_404(
-            Obra,
-            Q(cliente_principal__usuario=self.request.user)
-            | Q(clientes__usuario=self.request.user),
-            pk=obra_pk,
-        )
-        return context
+        return super().get_context_data(obra=self.obra, **kwargs)
 
 
 class DocumentoDetailView(
-    LoginRequiredMixin, ClienteGroupRequiredMixin, UserScopedQuerySetMixin, DetailView
+    LoginRequiredMixin,
+    ClienteGroupRequiredMixin,
+    AutorQuerySetMixin,
+    ObraRelatedQuerySetMixin,
+    DetailView,
 ):
     model = Documento
     template_name = "core/documento/detail.html"
     context_object_name = "documento"
 
-    def get_user_filter(self):
-        return Q(obra__cliente_principal__usuario=self.request.user) | Q(
-            obra__clientes__usuario=self.request.user
-        )
 
-
-class DocumentoCreateView(LoginRequiredMixin, ClienteGroupRequiredMixin, CreateView):
+class DocumentoCreateView(
+    LoginRequiredMixin,
+    ClienteGroupRequiredMixin,
+    ObraContextMixin,
+    SuccessMessageMixin,
+    CreateView,
+):
+    success_message = "Documento cadastrado."
     model = Documento
     form_class = DocumentoForm
     template_name = "core/form.html"
 
-    def get_obra(self):
-        return get_object_or_404(
-            Obra,
-            Q(cliente_principal__usuario=self.request.user)
-            | Q(clientes__usuario=self.request.user),
-            pk=self.kwargs["obra_pk"],
-        )
-
     def get_success_url(self):
-        return reverse_lazy("obra_detail", kwargs={"pk": self.object.obra.pk})
+        return reverse_lazy("obra_detail", kwargs={"pk": self.object.obra_id})
 
-    def get_initial(self):
-        initial = super().get_initial()
-        initial["obra"] = self.get_obra()
-        return initial
-
+    @transaction.atomic
     def form_valid(self, form):
-        form.instance.obra = self.get_obra()
+        form.instance.obra = self.bloquear_obra()
+        form.instance.cadastrado_por = self.request.user
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
@@ -86,48 +76,50 @@ class DocumentoCreateView(LoginRequiredMixin, ClienteGroupRequiredMixin, CreateV
 
 
 class DocumentoUpdateView(
-    LoginRequiredMixin, ClienteGroupRequiredMixin, UserScopedQuerySetMixin, UpdateView
+    LoginRequiredMixin,
+    ClienteGroupRequiredMixin,
+    AutorQuerySetMixin,
+    ObraRelatedQuerySetMixin,
+    SuccessMessageMixin,
+    UpdateView,
 ):
+    success_message = "Documento atualizado."
     model = Documento
     form_class = DocumentoForm
     template_name = "core/form.html"
 
     def get_success_url(self):
-        return reverse_lazy("obra_detail", kwargs={"pk": self.object.obra.pk})
+        return reverse_lazy("obra_detail", kwargs={"pk": self.object.obra_id})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
             "titulo": "Editar documento",
             "botao": "Atualizar",
-            "cancel_url": reverse_lazy("obra_detail", kwargs={"pk": self.object.obra.pk}),
+            "cancel_url": reverse_lazy("obra_detail", kwargs={"pk": self.object.obra_id}),
         })
         return context
 
-    def get_user_filter(self):
-        return Q(obra__cliente_principal__usuario=self.request.user) | Q(
-            obra__clientes__usuario=self.request.user
-        )
-
 
 class DocumentoDeleteView(
-    LoginRequiredMixin, ClienteGroupRequiredMixin, UserScopedQuerySetMixin, DeleteView
+    LoginRequiredMixin,
+    ClienteGroupRequiredMixin,
+    AutorQuerySetMixin,
+    ObraRelatedQuerySetMixin,
+    SuccessMessageMixin,
+    DeleteView,
 ):
+    success_message = "Documento excluído."
     model = Documento
     template_name = "core/confirm_delete.html"
 
     def get_success_url(self):
-        return reverse_lazy("obra_detail", kwargs={"pk": self.object.obra.pk})
+        return reverse_lazy("obra_detail", kwargs={"pk": self.object.obra_id})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
             "titulo": "Excluir documento",
-            "cancel_url": reverse_lazy("obra_detail", kwargs={"pk": self.object.obra.pk}),
+            "cancel_url": reverse_lazy("obra_detail", kwargs={"pk": self.object.obra_id}),
         })
         return context
-
-    def get_user_filter(self):
-        return Q(obra__cliente_principal__usuario=self.request.user) | Q(
-            obra__clientes__usuario=self.request.user
-        )

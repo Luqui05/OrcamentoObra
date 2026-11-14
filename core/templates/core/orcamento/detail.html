@@ -24,7 +24,7 @@
         <p><strong>Mensagem do Cliente:</strong> {{ orcamento.mensagem_cliente|default:"-" }}</p>
         <p class="mb-0"><strong>Arquivo PDF:</strong>
             {% if orcamento.arquivo_pdf %}
-                <a href="{{ orcamento.arquivo_pdf.url }}" target="_blank" class="btn btn-sm btn-outline-primary">Baixar</a>
+                <a href="{% url 'orcamento_arquivo' orcamento.pk %}" target="_blank" class="btn btn-sm btn-outline-primary">Baixar</a>
             {% else %}
                 -
             {% endif %}

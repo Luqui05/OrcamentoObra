@@ -35,6 +35,12 @@ from .views import (
     ImagemObraDeleteView,
 )
 
+from .views.arquivos import (
+    DocumentoArquivoView,
+    ImagemObraArquivoView,
+    OrcamentoArquivoView,
+)
+
 urlpatterns = [
     path("", HomeTemplateView.as_view(), name="index"),
     path("sobre/", SobreTemplateView.as_view(), name="sobre"),
@@ -57,6 +63,9 @@ urlpatterns = [
     path("obras/<int:pk>/excluir/", ObraDeleteView.as_view(), name="obra_delete"),
     
     # Orcamento
+    path(
+        "orcamentos/<int:pk>/arquivo/", OrcamentoArquivoView.as_view(), name="orcamento_arquivo"
+    ),
     path(
         "orcamentos/<int:pk>/", OrcamentoDetailView.as_view(), name="orcamento_detail"
     ),
@@ -104,6 +113,9 @@ urlpatterns = [
     ),
     # Documentos
     path(
+        "documentos/<int:pk>/arquivo/", DocumentoArquivoView.as_view(), name="documento_arquivo"
+    ),
+    path(
         "obras/<int:obra_pk>/documentos/",
         DocumentoListView.as_view(),
         name="documento_list",
@@ -129,6 +141,7 @@ urlpatterns = [
         name="documento_delete",
     ),
     # Imagens
+    path("imagens/<int:pk>/arquivo/", ImagemObraArquivoView.as_view(), name="imagem_arquivo"),
     path(
         "obras/<int:obra_pk>/imagens/",
         ImagemObraListView.as_view(),

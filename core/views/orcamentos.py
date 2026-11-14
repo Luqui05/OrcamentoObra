@@ -1,3 +1,4 @@
+from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
 from django.core.exceptions import PermissionDenied
 from django.views.generic import DetailView, CreateView, UpdateView, DeleteView
@@ -10,6 +11,7 @@ from core.views.mixins import (
     ClienteGroupRequiredMixin,
     LoginRequiredMixin,
     UserScopedQuerySetMixin,
+    obras_do_usuario,
 )
 
 
@@ -26,17 +28,20 @@ class OrcamentoDetailView(
         )
 
 
-class OrcamentoCreateView(LoginRequiredMixin, ClienteGroupRequiredMixin, CreateView):
+class OrcamentoCreateView(
+    LoginRequiredMixin,
+    ClienteGroupRequiredMixin,
+    SuccessMessageMixin,
+    CreateView,
+):
+    success_message = "Orçamento cadastrado."
     model = Orcamento
     form_class = OrcamentoForm
     template_name = "core/form.html"
 
     def get_obra(self):
         return get_object_or_404(
-            Obra,
-            Q(cliente_principal__usuario=self.request.user)
-            | Q(clientes__usuario=self.request.user),
-            pk=self.kwargs["obra_pk"],
+            obras_do_usuario(self.request.user), pk=self.kwargs["obra_pk"]
         )
 
     def get_success_url(self):
@@ -65,8 +70,13 @@ class OrcamentoCreateView(LoginRequiredMixin, ClienteGroupRequiredMixin, CreateV
 
 
 class OrcamentoUpdateView(
-    LoginRequiredMixin, ClienteGroupRequiredMixin, UserScopedQuerySetMixin, UpdateView
+    LoginRequiredMixin,
+    ClienteGroupRequiredMixin,
+    UserScopedQuerySetMixin,
+    SuccessMessageMixin,
+    UpdateView,
 ):
+    success_message = "Orçamento atualizado."
     model = Orcamento
     form_class = OrcamentoForm
     template_name = "core/form.html"
@@ -93,8 +103,13 @@ class OrcamentoUpdateView(
 
 
 class OrcamentoDeleteView(
-    LoginRequiredMixin, ClienteGroupRequiredMixin, UserScopedQuerySetMixin, DeleteView
+    LoginRequiredMixin,
+    ClienteGroupRequiredMixin,
+    UserScopedQuerySetMixin,
+    SuccessMessageMixin,
+    DeleteView,
 ):
+    success_message = "Orçamento excluído."
     model = Orcamento
     template_name = "core/confirm_delete.html"
 

@@ -14,9 +14,9 @@
     <div class="card-body">
         {% if imagem.imagem %}
         <div class="mb-3 text-center">
-            <img src="{{ imagem.imagem.url }}" alt="{{ imagem.legenda|default:imagem }}" class="img-fluid rounded shadow-sm">
+            <img src="{% url 'imagem_arquivo' imagem.pk %}" alt="{{ imagem.legenda|default:imagem }}" class="img-fluid rounded shadow-sm">
         </div>
-        <p><a href="{{ imagem.imagem.url }}" target="_blank" class="btn btn-primary">Abrir imagem</a></p>
+        <p><a href="{% url 'imagem_arquivo' imagem.pk %}" target="_blank" class="btn btn-primary">Abrir imagem</a></p>
         {% endif %}
         <p><strong>Obra:</strong> {{ imagem.obra.titulo }}</p>
         <p>

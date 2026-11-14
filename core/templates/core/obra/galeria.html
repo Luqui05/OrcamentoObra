@@ -3,6 +3,7 @@
 {% block title %}Galeria da obra{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.5/css/lightbox.min.css">
 <style>
     .galeria-wrap {
         background: var(--oo-surface);
@@ -206,7 +207,8 @@
                 <div class="galeria-grid">
                     {% for item in galeria_midias %}
                         <div class="galeria-card">
-                            <a href="{{ item.url }}" target="_blank" class="galeria-item" title="Abrir imagem">
+                            <a href="{{ item.url }}" target="_blank" class="galeria-item" title="Abrir imagem"
+                               data-lightbox="imagens-obra" data-alt="{{ item.titulo }}">
                                 <img src="{{ item.url }}" alt="{{ item.titulo }}">
                                 <div class="info">
                                     <div>{{ item.titulo }}</div>
@@ -273,4 +275,10 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+{% if galeria_midias %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.5/js/lightbox.min.js"></script>
+{% endif %}
 {% endblock %}

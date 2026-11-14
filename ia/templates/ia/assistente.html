@@ -1,0 +1,63 @@
+{% extends "ia/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'ia/assistente.css' %}">
+{% endblock %}
+
+{% block ia_content %}
+<div class="row justify-content-center">
+    <div class="col-xl-9">
+        {% if aviso_envio %}
+            <p class="alert alert-light">{{ aviso_envio }}</p>
+        {% else %}
+        <section class="card mb-4" aria-label="Perguntar ao assistente">
+            <div class="card-body">
+                <p class="text-muted">Pergunte como usar o OrcamentoObra. As mensagens são enviadas a um provedor de IA, portanto evite incluir dados pessoais ou sigilosos.</p>
+                <form action="{% url 'ia:enviar_mensagem' %}" method="post" id="ia-pergunta-form">
+                    {% csrf_token %}
+                    <label for="{{ form.pergunta.id_for_label }}" class="form-label fw-semibold">{{ form.pergunta.label }}</label>
+                    {{ form.pergunta }}
+                    <button type="submit" class="btn btn-primary mt-3">
+                        <i class="fas fa-paper-plane me-2" aria-hidden="true"></i>Enviar pergunta
+                    </button>
+                </form>
+                <p id="ia-status" class="text-muted mt-3 mb-0" role="status" hidden></p>
+                <p id="ia-erro" class="alert alert-danger mt-3 mb-0" role="alert" hidden></p>
+            </div>
+        </section>
+        {% endif %}
+
+        <section aria-labelledby="ia-historico-titulo">
+            <h2 class="h5 mb-3" id="ia-historico-titulo">Histórico de perguntas</h2>
+            <div id="ia-interacoes">
+                {% for interacao in interacoes %}
+                    <article class="card mb-3">
+                        <div class="card-header">
+                            <h3 class="h6 mb-1 ia-pergunta">{{ interacao.pergunta }}</h3>
+                            <small class="text-muted">{{ interacao.criada_em|date:"d/m/Y H:i" }}</small>
+                        </div>
+                        <div class="card-body ia-resposta">{{ interacao.resposta_html|safe }}</div>
+                    </article>
+                {% empty %}
+                    <p class="text-muted" id="ia-sem-interacoes">Suas perguntas e respostas aparecerão aqui.</p>
+                {% endfor %}
+            </div>
+            {% include "core/_pagination.html" %}
+        </section>
+    </div>
+</div>
+
+{% if not aviso_envio %}
+    <template id="ia-interacao-template">
+        <article class="card mb-3">
+            <div class="card-header">
+                <h3 class="h6 mb-0 ia-pergunta"></h3>
+            </div>
+            <div class="card-body ia-resposta"></div>
+        </article>
+    </template>
+    <script src="{% static 'ia/assistente.js' %}" defer></script>
+{% endif %}
+{% endblock %}

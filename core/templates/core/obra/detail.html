@@ -160,9 +160,9 @@
                             <div class="card mx-auto obra-carousel-card" style="max-width: 920px;">
                                 <div class="row g-0">
                                     <div class="col-md-5">
-                                            {% if atualizacao.imagens.first %}
+                                            {% if atualizacao.imagens_visiveis %}
                                                 <div class="obra-carousel-media h-100">
-                                                    <img src="{{ atualizacao.imagens.first.imagem.url }}" class="img-fluid" alt="Imagem da atualização">
+                                                    <img src="{% url 'imagem_arquivo' atualizacao.imagens_visiveis.0.pk %}" class="img-fluid" alt="Imagem da atualização">
                                                 </div>
                                         {% else %}
                                             <div class="obra-carousel-media text-muted border-end">

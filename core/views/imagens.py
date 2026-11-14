@@ -1,79 +1,84 @@
-from django.urls import reverse_lazy
-from django.db.models import Q
+from django.contrib.messages.views import SuccessMessageMixin
+from django.db import transaction
 from django.shortcuts import get_object_or_404
+from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 from core.forms import ImagemObraForm
-from core.models import ImagemObra, Obra
+from core.models import AtualizacaoObra, ImagemObra
 from core.views.mixins import (
     ClienteGroupRequiredMixin,
     LoginRequiredMixin,
-    UserScopedQuerySetMixin,
+    ObraContextMixin,
+    ObraRelatedQuerySetMixin,
+    AutorQuerySetMixin,
+    bloquear_obra_do_usuario,
 )
 
 
-class ImagemObraListView(LoginRequiredMixin, ClienteGroupRequiredMixin, ListView):
+class ImagemObraListView(
+    LoginRequiredMixin,
+    ClienteGroupRequiredMixin,
+    ObraContextMixin,
+    AutorQuerySetMixin,
+    ListView,
+):
     model = ImagemObra
     template_name = "core/imagem/list.html"
     context_object_name = "imagens"
     paginate_by = 9
 
     def get_queryset(self):
-        obra_pk = self.kwargs.get("obra_pk")
-        return ImagemObra.objects.filter(
-            Q(obra__cliente_principal__usuario=self.request.user)
-            | Q(obra__clientes__usuario=self.request.user),
-            obra__pk=obra_pk,
-        ).distinct()
+        return super().get_queryset().filter(obra=self.obra).select_related("atualizacao_obra", "obra")
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        obra_pk = self.kwargs.get("obra_pk")
-        context["obra"] = get_object_or_404(
-            Obra,
-            Q(cliente_principal__usuario=self.request.user)
-            | Q(clientes__usuario=self.request.user),
-            pk=obra_pk,
-        )
-        return context
+        return super().get_context_data(obra=self.obra, **kwargs)
 
 
 class ImagemObraDetailView(
-    LoginRequiredMixin, ClienteGroupRequiredMixin, UserScopedQuerySetMixin, DetailView
+    LoginRequiredMixin,
+    ClienteGroupRequiredMixin,
+    AutorQuerySetMixin,
+    ObraRelatedQuerySetMixin,
+    DetailView,
 ):
     model = ImagemObra
     template_name = "core/imagem/detail.html"
     context_object_name = "imagem"
 
-    def get_user_filter(self):
-        return Q(obra__cliente_principal__usuario=self.request.user) | Q(
-            obra__clientes__usuario=self.request.user
-        )
 
-
-class ImagemObraCreateView(LoginRequiredMixin, ClienteGroupRequiredMixin, CreateView):
+class ImagemObraCreateView(
+    LoginRequiredMixin,
+    ClienteGroupRequiredMixin,
+    ObraContextMixin,
+    SuccessMessageMixin,
+    CreateView,
+):
+    success_message = "Imagem cadastrada."
     model = ImagemObra
     form_class = ImagemObraForm
     template_name = "core/form.html"
 
-    def get_obra(self):
-        return get_object_or_404(
-            Obra,
-            Q(cliente_principal__usuario=self.request.user)
-            | Q(clientes__usuario=self.request.user),
-            pk=self.kwargs["obra_pk"],
-        )
-
     def get_success_url(self):
-        return reverse_lazy("obra_detail", kwargs={"pk": self.object.obra.pk})
+        return reverse_lazy("obra_detail", kwargs={"pk": self.object.obra_id})
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs["obra"] = self.get_obra()
+        kwargs["obra"] = self.obra
         return kwargs
 
+    @transaction.atomic
     def form_valid(self, form):
-        form.instance.obra = self.get_obra()
+        obra = self.bloquear_obra()
+        form.instance.obra = obra
+        form.instance.cadastrado_por = self.request.user
+        atualizacao = form.cleaned_data.get("atualizacao_obra")
+        if atualizacao:
+            form.instance.atualizacao_obra = get_object_or_404(
+                AtualizacaoObra.objects.select_for_update(),
+                pk=atualizacao.pk,
+                obra=obra,
+            )
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
@@ -86,53 +91,70 @@ class ImagemObraCreateView(LoginRequiredMixin, ClienteGroupRequiredMixin, Create
 
 
 class ImagemObraUpdateView(
-    LoginRequiredMixin, ClienteGroupRequiredMixin, UserScopedQuerySetMixin, UpdateView
+    LoginRequiredMixin,
+    ClienteGroupRequiredMixin,
+    AutorQuerySetMixin,
+    ObraRelatedQuerySetMixin,
+    SuccessMessageMixin,
+    UpdateView,
 ):
+    success_message = "Imagem atualizada."
     model = ImagemObra
     form_class = ImagemObraForm
     template_name = "core/form.html"
 
+    def get_queryset(self):
+        return super().get_queryset().select_related("obra", "atualizacao_obra")
+
     def get_success_url(self):
-        return reverse_lazy("obra_detail", kwargs={"pk": self.object.obra.pk})
+        return reverse_lazy("obra_detail", kwargs={"pk": self.object.obra_id})
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["obra"] = self.object.obra
         return kwargs
 
+    @transaction.atomic
+    def form_valid(self, form):
+        obra = bloquear_obra_do_usuario(self.request.user, self.object.obra_id)
+        atualizacao = form.cleaned_data.get("atualizacao_obra")
+        if atualizacao:
+            form.instance.atualizacao_obra = get_object_or_404(
+                AtualizacaoObra.objects.select_for_update(),
+                pk=atualizacao.pk,
+                obra=obra,
+            )
+        return super().form_valid(form)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
             "titulo": "Editar imagem da obra",
             "botao": "Atualizar",
-            "cancel_url": reverse_lazy("obra_detail", kwargs={"pk": self.object.obra.pk}),
+            "cancel_url": reverse_lazy("obra_detail", kwargs={"pk": self.object.obra_id}),
         })
         return context
 
-    def get_user_filter(self):
-        return Q(obra__cliente_principal__usuario=self.request.user) | Q(
-            obra__clientes__usuario=self.request.user
-        )
-
 
 class ImagemObraDeleteView(
-    LoginRequiredMixin, ClienteGroupRequiredMixin, UserScopedQuerySetMixin, DeleteView
+    LoginRequiredMixin,
+    ClienteGroupRequiredMixin,
+    AutorQuerySetMixin,
+    ObraRelatedQuerySetMixin,
+    SuccessMessageMixin,
+    DeleteView,
 ):
+    success_message = "Imagem excluída."
     model = ImagemObra
     template_name = "core/confirm_delete.html"
 
     def get_success_url(self):
-        return reverse_lazy("obra_detail", kwargs={"pk": self.object.obra.pk})
+        return reverse_lazy("obra_detail", kwargs={"pk": self.object.obra_id})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
             "titulo": "Excluir imagem da obra",
-            "cancel_url": reverse_lazy("obra_detail", kwargs={"pk": self.object.obra.pk}),
+            "cancel_url": reverse_lazy("obra_detail", kwargs={"pk": self.object.obra_id}),
         })
         return context
-
-    def get_user_filter(self):
-        return Q(obra__cliente_principal__usuario=self.request.user) | Q(
-            obra__clientes__usuario=self.request.user
-        )

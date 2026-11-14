@@ -1,0 +1,19 @@
+.ia-pergunta {
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+}
+
+.ia-resposta {
+    overflow-wrap: anywhere;
+}
+
+.ia-resposta > :last-child {
+    margin-bottom: 0;
+}
+
+.ia-resposta pre,
+.ia-resposta blockquote {
+    border-radius: .5rem;
+    background: var(--oo-surface-soft);
+    padding: .75rem;
+}
